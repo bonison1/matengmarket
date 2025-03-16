@@ -1,0 +1,45 @@
+.rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.rating input {
+  display: none;
+}
+
+.rating label {
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  font-size: inherit;
+  color: gray;
+}
+
+/* Default star */
+.rating label:before {
+  content: '★';
+  display: inline-block;
+}
+
+/* Hover Effect */
+.rating label:hover,
+.rating label:hover ~ label {
+  background: linear-gradient(to bottom, #6fc902 0%, #d8d830 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Selected stars */
+.rating input:checked ~ label {
+  background: linear-gradient(to bottom, #7EE501 0%, #eeee35 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #e58e09;
+}
+
+/* When hovered over an already selected star */
+.rating input:checked + label:hover,
+.rating input:checked + label:hover ~ label {
+  color: #e58e09;
+}
