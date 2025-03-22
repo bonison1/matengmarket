@@ -1,21 +1,50 @@
-'use client'
+'use client';
 
-import { ScrollArea } from '@/components/ui/scroll-area'
-import React, { useEffect, useState } from 'react'
+import { ScrollArea } from '@/components/ui/scroll-area';
+import React, { useEffect, useState } from 'react';
 import { CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Search } from 'lucide-react'
+import { Search } from 'lucide-react';
 import StoreCard from './storeCard';
-import './page.css'
+import './page.css';
+import { Store } from '@/utils/types/store';
+import { Skeleton } from '@/components/ui/skeleton';
+import WordFlipLoader from '@/components/loader/wordFlipLoader';
 
 export default function Page() {
-    const totalCards = 5;
+    const [stores, setStores] = useState<Store[]>([]);
+    const [filteredStores, setFilteredStores] = useState<Store[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>(''); // Search term state
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>('');
+    const [cardsPerRow, setCardsPerRow] = useState(1);
+
     const cardWidth = 340;
     const gap = 16;
 
-    const [cardsPerRow, setCardsPerRow] = useState(1);
-    const [rating, setRating] = useState(4)
+    // Fetch stores on load
+    useEffect(() => {
+        const fetchStores = async () => {
+            try {
+                const res = await fetch('/api/stores');
+                const data = await res.json();
+                if (data.success) {
+                    setStores(data.data);
+                    setFilteredStores(data.data); // Initialize filtered
+                } else {
+                    setError('Failed to fetch stores.');
+                }
+            } catch (err) {
+                setError('An error occurred while fetching stores.');
+            } finally {
+                setLoading(false);
+            }
+        };
 
+        fetchStores();
+    }, []);
+
+    // Calculate cards per row on resize
     useEffect(() => {
         const updateCardsPerRow = () => {
             const containerWidth = window.innerWidth * 0.9;
@@ -24,119 +53,121 @@ export default function Page() {
         };
 
         updateCardsPerRow();
-        window.addEventListener("resize", updateCardsPerRow);
-        return () => window.removeEventListener("resize", updateCardsPerRow);
+        window.addEventListener('resize', updateCardsPerRow);
+        return () => window.removeEventListener('resize', updateCardsPerRow);
     }, []);
 
-    const lastRowCount = totalCards % cardsPerRow;
+    // Filter stores based on search term
+    useEffect(() => {
+        if (!searchTerm.trim()) {
+            setFilteredStores(stores);
+        } else {
+            const filtered = stores.filter((store) =>
+                store.business_name?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredStores(filtered);
+        }
+    }, [searchTerm, stores]);
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const lastRowCount = filteredStores.length % cardsPerRow;
     const placeholdersNeeded = lastRowCount === 0 ? 0 : cardsPerRow - lastRowCount;
 
-    const categories = [
-        "Fruits", "Vegetables", "Dairy", "Beverages", "Snacks",
-        "Frozen Food", "Bakery", "Pet Food",
-    ];
+    const categories = ["Fruits", "Vegetables", "Dairy", "Beverages", "Snacks", "Frozen Food", "Bakery", "Pet Food"];
 
     return (
         <div className='bg-[#efeee7] h-screen relative'>
-
             <ScrollArea>
-                <div className='w-[100vw]  h-[100svh] relative'>
+                <div className='w-[100vw] h-[100svh] relative'>
                     <div className='w-full h-16 bg-stone-600'></div>
 
                     <div className='w-full max-w-[1400px] mx-auto p-4 relative'>
-                        <div className='w-full h-56 flex flex-row relative rounded-2xl mt-6 mb-4'
+                        {/* Banner */}
+                        <div
+                            className='w-full h-56 flex flex-row relative rounded-2xl mt-6 mb-4'
                             style={{ background: "linear-gradient(323deg, rgba(34,51,29,1) 0%, rgba(71,93,65,1) 100%)" }}
                         >
                             <div className='w-3/5 flex flex-col gap-3 justify-center mb-10 ml-[4.5rem] z-10'>
                                 <div className='flex flex-col text-4xl leading-none font-bold text-[#fefce8]'>
-                                    <span>
-                                        Welcome to
-                                    </span>
-                                    <span>
-                                        Mateng Discovery
-                                    </span>
-
+                                    <span>Welcome to</span>
+                                    <span>Mateng Discovery</span>
                                 </div>
                                 <div className='w-1/2 leading-none text-sm text-gray-200/90'>
-                                    <span>Explore every businesses directly.</span>
+                                    <span>Explore every business directly.</span>
                                 </div>
                             </div>
-
-                            <div className='w-2/5 flex justify-start items-end z-10'>
-
-                            </div>
-
                             <div className='w-full h-14 absolute bottom-0 rounded-2xl flex items-center gap-3 overflow-hidden'>
                                 <div className="loop-slider" style={{ "--duration": "25951ms", "--direction": "normal" } as React.CSSProperties}>
                                     <div className="inner flex gap-3">
-                                        {categories.map((category, index) => (
-                                            <div
-                                                key={index}
-                                                className="tag py-1 px-6 rounded-full whitespace-nowrap text-gray-200/70"
-                                            >
-                                                <span>#</span> {category}
-                                            </div>
-                                        ))}
-                                        {categories.map((category, index) => (
-                                            <div
-                                                key={index}
-                                                className="tag py-1 px-6 rounded-full whitespace-nowrap text-gray-200/70"
-                                            >
+                                        {categories.concat(categories).map((category, index) => (
+                                            <div key={index} className="tag py-1 px-6 rounded-full whitespace-nowrap text-gray-200/70">
                                                 <span>#</span> {category}
                                             </div>
                                         ))}
                                     </div>
                                     <div className="fade"></div>
                                 </div>
-
                             </div>
-
-
                         </div>
 
-                        <div className='w-full  max-w-[1400px] mx-auto gap-4 mt-3 pb-10'>
-                            <div className='w-full bg-stone-600/0 backdrop-blur-lg sticky top-[4.2rem] z-10 px-4 pt-1 mb-4  '>
+                        {/* Explore Sellers */}
+                        <div className='w-full max-w-[1400px] mx-auto gap-4 mt-3 pb-10'>
+                            <div className='w-full bg-stone-600/0 backdrop-blur-lg sticky top-[4.2rem] z-10 px-4 pt-1 mb-4'>
                                 <div className='flex flex-row justify-between items-center'>
-                                    <CardTitle className='text-2xl w-1/2'>
-                                        Explore Sellers
-                                    </CardTitle>
+                                    <CardTitle className='text-2xl w-1/2'>Explore Sellers</CardTitle>
                                     <div className='flex items-end gap-3'>
                                         <div className="flex items-center w-64 h-[2.1rem] bg-white rounded-full shadow-sm px-4 space-x-2 border border-gray-200">
                                             <input
                                                 type="text"
                                                 className="flex-1 h-full text-sm outline-none bg-transparent placeholder-gray-500"
                                                 placeholder="Search businesses..."
+                                                value={searchTerm}
+                                                onChange={handleSearchChange}
                                             />
                                             <div className="h-5 w-px bg-gray-300"></div>
                                             <Search size={16} className="text-gray-500" />
                                         </div>
-
                                     </div>
-
                                 </div>
                                 <Separator className='bg-[#33323353] mt-1 p-[1px]' />
                             </div>
 
+                            {/* Store Cards */}
                             <div className="flex justify-center">
-                                <div className="inline-flex flex-wrap justify-center max-w-[1400px] gap-10 sm:gap-6 md:gap-4 w-full">
-                                    {Array.from({ length: totalCards }).map((_, index) => (
-                                        <StoreCard key={index} id={index + 1} rating={rating} />
+                                <div className="inline-flex flex-wrap justify-center max-w-[1400px] gap-10 sm:gap-6 md:gap-2 w-full">
+                                    {loading && (
+                                        <div className="w-full">
+                                            {/* <div className="mb-4 text-gray-600 text-lg text-center">Loading stores...</div> */}
+                                            <div className='flex justify-center mb-4'>
+                                                <WordFlipLoader />
+                                            </div>
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                <Skeleton className="h-56 w-full" />
+                                                <Skeleton className="h-56 w-full" />
+                                                <Skeleton className="h-56 w-full" />
+                                                <Skeleton className="h-56 w-full" />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {error && <p className="text-red-600">{error}</p>}
+
+                                    {!loading && !error && filteredStores.map((store) => (
+                                        <StoreCard key={store.user_id} store={store} />
                                     ))}
 
                                     {Array.from({ length: placeholdersNeeded }).map((_, index) => (
-                                        <div
-                                            key={`placeholder-${index}`}
-                                            className="w-[300px] h-[375px] m-4 sm:m-8 md:m-10 opacity-0 shadow-none pointer-events-none"
-                                        />
+                                        <div key={`placeholder-${index}`} className="w-[300px] h-[375px] m-4 sm:m-8 md:m-10 opacity-0 shadow-none pointer-events-none" />
                                     ))}
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
                 </div>
             </ScrollArea>
         </div>
-    )
+    );
 }

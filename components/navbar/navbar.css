@@ -53,7 +53,7 @@
   font-weight: 600;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cartBtn span {

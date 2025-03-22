@@ -1,120 +1,97 @@
+import { Product } from "@/utils/types/product";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Product {
-  id: number;
-  image: string;
-  name: string;
-  code: string;
-  color: string;
-  size: string;
-  price: number;
+export interface CartProduct extends Product {
   quantity: number;
-  note?: string;
+  itemPrice: number;        // discounted or price_inr
+  originalPrice: number;    // original price
 }
 
 interface CartState {
-  items: Product[];
-  totalPrice: number;
+  items: CartProduct[];
+  totalPrice: number;        // total discounted price
+  totalOriginalPrice: number; // total original price
 }
 
 const initialState: CartState = {
-  items: [
-    {
-      id: 1,
-      image: "/img1.jpg",
-      name: "Blue Hoodie",
-      code: "Hodie-B",
-      color: "Blue",
-      size: "M",
-      price: 17.99,
-      quantity: 0,
-      note: "Note, 1 piece",
-    },
-    {
-      id: 2,
-      image: "/img2.jpg",
-      name: "White Hoodie",
-      code: "Hodie-W",
-      color: "White",
-      size: "M",
-      price: 35.99,
-      quantity: 0,
-    },
-    {
-      id: 3,
-      image: "/img3.jpg",
-      name: "Blue Hoodie",
-      code: "Hodie-B",
-      color: "Blue",
-      size: "M",
-      price: 17.99,
-      quantity: 0,
-      note: "Note, 1 piece",
-    },
-    {
-      id: 4,
-      image: "/img4.jpg",
-      name: "White Hoodie",
-      code: "Hodie-W",
-      color: "White",
-      size: "M",
-      price: 35.99,
-      quantity: 0,
-    },
-    {
-      id: 5,
-      image: "/img6.jpg",
-      name: "Blue Hoodie",
-      code: "Hodie-B",
-      color: "Blue",
-      size: "M",
-      price: 17.99,
-      quantity: 0,
-      note: "Note, 1 piece",
-    },
-    {
-      id: 6,
-      image: "/imag5.jpg",
-      name: "White Hoodie",
-      code: "Hodie-W",
-      color: "White",
-      size: "M",
-      price: 35.99,
-      quantity: 0,
-    },
-  ],
+  items: [],
   totalPrice: 0,
+  totalOriginalPrice: 0,
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    hydrateCart: (state, action: PayloadAction<CartState>) => {
+      return action.payload;
+    },
+
     addToCart: (state, action: PayloadAction<Product>) => {
-      const item = state.items.find((p) => p.id === action.payload.id);
+      const product = action.payload;
+      const itemPrice = product.discounted_price ?? product.price_inr ?? 0;
+      const originalPrice = product.price_inr ?? 0;
+
+      const existingItem = state.items.find(item => item.id === product.id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        state.items.push({ ...product, quantity: 1, itemPrice, originalPrice });
+      }
+
+      state.totalPrice += itemPrice;
+      state.totalOriginalPrice += originalPrice;
+    },
+
+    removeFromCart: (state, action: PayloadAction<number>) => {
+      const index = state.items.findIndex(item => item.id === action.payload);
+      if (index >= 0) {
+        const item = state.items[index];
+        state.totalPrice -= item.itemPrice * item.quantity;
+        state.totalOriginalPrice -= item.originalPrice * item.quantity;
+        state.items.splice(index, 1);
+      }
+    },
+
+    increaseQuantity: (state, action: PayloadAction<number>) => {
+      const item = state.items.find(item => item.id === action.payload);
       if (item) {
         item.quantity += 1;
-      } else {
-        state.items.push({ ...action.payload, quantity: 1 });
-      }
-      state.totalPrice += action.payload.price;
-    },
-    removeFromCart: (state, action: PayloadAction<number>) => {
-      const itemIndex = state.items.findIndex((p) => p.id === action.payload);
-      if (itemIndex >= 0) {
-        state.totalPrice -= state.items[itemIndex].price * state.items[itemIndex].quantity;
-        state.items.splice(itemIndex, 1);
+        state.totalPrice += item.itemPrice;
+        state.totalOriginalPrice += item.originalPrice;
       }
     },
+
     decreaseQuantity: (state, action: PayloadAction<number>) => {
-      const item = state.items.find((p) => p.id === action.payload);
-      if (item && item.quantity > 0) {
-        item.quantity -= 1;
-        state.totalPrice -= item.price;
+      const item = state.items.find(item => item.id === action.payload);
+      if (item) {
+        if (item.quantity > 1) {
+          item.quantity -= 1;
+          state.totalPrice -= item.itemPrice;
+          state.totalOriginalPrice -= item.originalPrice;
+        } else {
+          state.totalPrice -= item.itemPrice;
+          state.totalOriginalPrice -= item.originalPrice;
+          state.items = state.items.filter((cartItem) => cartItem.id !== action.payload);
+        }
       }
+    },
+
+    clearCart: (state) => {
+      state.items = [];
+      state.totalPrice = 0;
+      state.totalOriginalPrice = 0;
     },
   },
 });
 
-export const { addToCart, removeFromCart, decreaseQuantity } = cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  increaseQuantity,
+  decreaseQuantity,
+  clearCart,
+  hydrateCart,
+} = cartSlice.actions;
+
 export default cartSlice.reducer;

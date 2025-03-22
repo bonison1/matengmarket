@@ -6,48 +6,73 @@ import { useRouter } from 'next/navigation';
 import "./storeCard.css"
 
 interface StoreCardProps {
-    rating: number; 
-    id: number;
-  }
+    store: {
+        user_id: string;
+        business_name: string;
+        business_type: string;
+        product_service: string;
+        business_experience: string;
+        photo?: string;
+        categories: string[];
+        ratings: number;
+        whatsapp: string;
+    };
+}
 
-  export default function StoreCard({ rating, id }: StoreCardProps) {
+
+export default function StoreCard({ store }: StoreCardProps) {
 
     const router = useRouter();
-    const [starSize, setStarSize] = useState(20); 
+    const [starSize, setStarSize] = useState(20);
 
-  useEffect(() => {
-    const updateSize = () => {
-      setStarSize(window.innerWidth < 540 ? 16 : 20); 
+    useEffect(() => {
+        const updateSize = () => {
+            setStarSize(window.innerWidth < 540 ? 16 : 20);
+        };
+
+        updateSize();
+        window.addEventListener("resize", updateSize);
+
+        return () => window.removeEventListener("resize", updateSize);
+    }, []);
+
+    const handleNavigate = () => {
+        router.push(`/discover/${store.user_id}`);
     };
 
-    updateSize(); 
-    window.addEventListener("resize", updateSize);
-
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
-
-  const handleNavigate = () => {
-    router.push(`/discover/${id}`);
-};
 
 
     return (
         <div className='p-4 sm:p-8 md:p-10 poppins'>
-            <div className="store-card h-[325px] w-[250px] md:w-[300px] md:h-[375px]">
+            <div className="store-card h-[325px] w-[250px] sm:w-[300px] md:h-[430px]">
                 <div className="content">
-                    <img src="./imag5.jpg" alt="imag" className='h-[70%] object-cover rounded-lg' />
-                    <div className="w-full flex flex-col items-center mt-3">
-                        <span className="title text-black text-xl font-semibold b-0">
-                            Air Max 90
+                    <img
+                        src={store.photo || "/placeholder.jpg"}
+                        alt={store.business_name}
+                        className='object-cover rounded-lg'
+                        style={{ height: "70%", width: "100%" }}
+                        onError={(e) => { e.currentTarget.src = "./unavailable.jpg"; }}
+                        onClick={handleNavigate}
+                    />
+                    <div className="w-full flex flex-col items-center mt-3 gap-1">
+                        <span className="title text-black text-xl font-semibold b-0 capitalize">
+                            {store.business_name ? store.business_name : "Not Available"}
                         </span>
-                        <span className="text-[#00000066]">
-                            Nike | Shoe
+                        <span
+                            className="text-[#00000066] text-sm font-semibold flex items-center justify-center text-center max-w-[90%] capitalize"
+                            style={{ height: '2em' }}
+                        >
+                            {store.business_type ? store.business_type : "Not Available"}
                         </span>
+
+                        {/* <span className="text-[#00000066]">
+                            {store.product_service}
+                        </span> */}
 
                         <div className='w-full h-12 flex justify-between items-center p-2'>
                             <div className='flex flex-col leading-none'>
                                 <span className='text-sm font-medium text-[#9D9898CC] pl-1 translate-y-0.5 hover:text-[#9D9898]'>Rating</span>
-                                <Rating rating={rating} editable={false} size={starSize} />
+                                <Rating rating={store.ratings} editable={false} size={starSize} />
                             </div>
                             <div>
                                 <button

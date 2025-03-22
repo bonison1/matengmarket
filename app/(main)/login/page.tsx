@@ -7,7 +7,7 @@ import { SignupForm } from "@/components/signup-form"
 
 export default function LoginPage() {
   const { setTheme } = useTheme()
-  const [isLogin, setIsLogin] = useState(true) // true -> Login, false -> Signup
+  const [isLogin, setIsLogin] = useState(true) 
 
   useEffect(() => {
     setTheme("dark")
