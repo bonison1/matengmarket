@@ -110,7 +110,7 @@ export default function Page() {
   return (
     <div className="bg-[#efeee7] min-h-screen flex flex-col items-center justify-start relative">
       <ScrollArea>
-        <div className="h-full">
+        <div className="h-[100svh]">
           {/* Store Cover */}
           <div className="w-full relative">
             <div className="w-[100vw] h-86 bg-stone-700 flex items-center justify-center">

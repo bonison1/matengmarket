@@ -553,7 +553,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
                     </div>
 
                     <div className="flex flex-row justify-between gap-2">
-                        {/* {Number(product.quantity ?? 0) > 0 ? (
+                        {Number(product.quantity ?? 0) > 0 ? (
                             <Button
                                 className="bg-gradient-to-b from-[#38D932] to-[#12850E]"
                                 onClick={handleAddToCart}
@@ -567,13 +567,13 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
                             >
                                 Out of Stock
                             </Button>
-                        )} */}
-                        <Button
+                        )}
+                        {/* <Button
                             className="bg-gradient-to-b from-[#38D932] to-[#12850E]"
                             onClick={handleAddToCart}
                         >
                             Add to Cart <ShoppingBasket className="ml-2 mb-1" />
-                        </Button>
+                        </Button> */}
 
                         {isInCart && (
                             <div className="flex items-center justify-between text-[#624b4b] w-32 border rounded-md shadow-md bg-neutral-100/70 text-gray-900">
