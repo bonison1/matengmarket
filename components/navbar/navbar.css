@@ -155,12 +155,8 @@
 .small-navbar {
   background-color: none;
   width: 100%;
-  height: fit-content;
   z-index: 1000;
   position: relative;
-  align-items: center;
-  padding: 0.5rem 1.5rem;
-  flex-direction: column;
   display: none;
 }
 

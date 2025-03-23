@@ -298,6 +298,8 @@ export default function Page() {
     const [filterActive, setFilterActive] = useState<boolean>(false)
     const [sort, setSort] = useState<string>('')
 
+    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
     useEffect(() => {
         setTheme("light")
         fetchProducts()
@@ -392,22 +394,23 @@ export default function Page() {
 
                     <div className='w-full max-w-[1400px] mx-auto p-4 relative'>
                         {/* Banner */}
-                        <div className='w-full h-56 flex flex-row relative rounded-2xl mt-6 mb-4'
+                        <div className='w-full flex flex-col sm:flex-row relative rounded-2xl mt-6 mb-4'
                             style={{ background: "linear-gradient(323deg, rgba(34,51,29,1) 0%, rgba(71,93,65,1) 100%)" }}>
-                            <div className='w-3/5 flex flex-col gap-3 justify-center mb-10 ml-[4.5rem] z-10'>
-                                <div className='flex flex-col text-4xl leading-none font-bold text-[#fefce8]'>
+                            <div className='w-full sm:w-3/5 flex flex-col gap-3 justify-center p-6 sm:p-0 mb-10 sm:ml-[4.5rem] z-10'>
+                                <div className='flex flex-col text-2xl md:text-4xl leading-none font-bold text-[#fefce8]'>
                                     <span>Get the very best</span>
                                     <span>products for your home</span>
                                 </div>
-                                <div className='w-1/2 leading-none text-sm text-gray-200/90'>
+                                <div className='w-full sm:w-1/2 leading-none text-xs sm:text-sm text-gray-200/90'>
                                     <span>Purple raindrops danced on the windowpane during the unexpected summer storm.</span>
                                 </div>
                             </div>
-                            <div className='w-2/5 flex justify-start items-end z-10'>
+
+                            <div className='w-full sm:w-2/5 flex justify-center sm:justify-start items-end z-10'>
                                 <ProductBanner />
                             </div>
 
-                            <div className='w-full h-14 absolute bottom-0 rounded-2xl flex items-center gap-3 overflow-hidden'>
+                            <div className='w-full h-14 absolute bottom-[58%] sm:bottom-0 sm:rounded-2xl flex items-center gap-3 overflow-hidden'>
                                 <div className="loop-slider" style={{ "--duration": "35951ms", "--direction": "normal" } as React.CSSProperties}>
                                     <div className="inner flex gap-3">
                                         {categoryElements}
@@ -424,30 +427,57 @@ export default function Page() {
                             <div className='flex flex-row justify-end items-center'>
                                 {/* <CardTitle className="text-2xl w-1/2">Products</CardTitle> */}
                                 <div className='flex items-end gap-3'>
-                                    <div className="flex items-center w-64 h-[2.1rem] bg-white rounded-full shadow-sm px-4 space-x-2 border border-gray-200">
-                                        <input
-                                            type="text"
-                                            className="flex-1 h-full text-sm outline-none bg-transparent placeholder-gray-500"
-                                            placeholder="Search product..."
-                                            value={searchQuery}
-                                            onChange={(e) => handleSearch(e.target.value)}
-                                        />
-                                        <div className="h-5 w-px bg-gray-300"></div>
-                                        <Search size={16} className="text-gray-500" />
+                                    <div className="relative">
+                                        {/* Mobile View */}
+                                        <div className="sm:hidden h-[2.1rem] flex items-center bg-white rounded-full shadow-sm px-2 sm:px-4 border border-gray-200 transition-all duration-300 ease-in-out"
+                                            style={{ width: mobileSearchOpen ? '14rem' : '2.5rem' }}
+                                        >
+                                            {mobileSearchOpen && (
+                                                <input
+                                                    type="text"
+                                                    className="flex-1 w-4/5 h-full text-[16px] outline-none bg-transparent placeholder-gray-500"
+                                                    placeholder="Search product..."
+                                                    value={searchQuery}
+                                                    onChange={(e) => handleSearch(e.target.value)}
+                                                    autoFocus
+                                                />
+
+                                            )}
+                                            <div className={`${mobileSearchOpen ? 'h-5 w-px bg-gray-300 mx-2' : ''}`}></div>
+                                            <Search
+                                                size={20}
+                                                className="text-gray-500 cursor-pointer"
+                                                onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                                            />
+                                        </div>
+
+
+                                        {/* Desktop View */}
+                                        <div className="hidden sm:flex items-center w-64 h-[2.1rem] bg-white rounded-full shadow-sm px-4 space-x-2 border border-gray-200">
+                                            <input
+                                                type="text"
+                                                className="flex-1 h-full text-sm outline-none bg-transparent placeholder-gray-500"
+                                                placeholder="Search product..."
+                                                value={searchQuery}
+                                                onChange={(e) => handleSearch(e.target.value)}
+                                            />
+                                            <div className="h-5 w-px bg-gray-300"></div>
+                                            <Search size={16} className="text-gray-500" />
+                                        </div>
                                     </div>
 
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
                                                 variant={filterActive ? 'default' : 'outline'}
-                                                className="w-24 h-[2.1rem] flex items-center rounded-md px-3 gap-2 shadow-sm"
+                                                className="w-fit h-[2.1rem] flex items-center rounded-md px-3 gap-2 shadow-sm"
                                             >
-                                                Filter
+                                                <span className="hidden sm:block">Filter</span>
                                                 <SlidersHorizontal size={16} />
                                             </Button>
                                         </PopoverTrigger>
 
-                                        <PopoverContent className="md:w-[32rem] bg-white px-6 space-y-4 rounded-lg shadow-lg border -translate-x-25">
+                                        <PopoverContent className="w-[22rem] md:w-[32rem] bg-white px-6 space-y-4 rounded-lg shadow-lg border -translate-x-8 sm:-translate-x-25">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-sm font-medium">Filters</span>
                                                 <Button variant="destructive" size="sm" onClick={clearFilters}>
@@ -465,7 +495,7 @@ export default function Page() {
 
                                             <div className="space-y-2">
                                                 <p className="text-sm font-semibold">Category</p>
-                                                <div className="grid grid-cols-2 gap-2">
+                                                <div className="grid sm:grid-cols-2 gap-2">
                                                     {categories.map((cat) => (
                                                         <Button
                                                             key={cat}
@@ -503,8 +533,8 @@ export default function Page() {
                             ) : filteredProducts.length > 0 ? (
                                 Object.entries(groupedProducts).map(([group, items]) => (
                                     <div key={group}>
-                                        <CardTitle className="text-2xl font-semibold mb-4 capitalize sticky top-[4.4rem] z-10 px-4">{group}</CardTitle>
-                                        <div className="flex flex-wrap gap-4">
+                                        <CardTitle className="w-fit text-2xl font-semibold mb-4 capitalize sticky top-[4.4rem] z-10 px-4">{group}</CardTitle>
+                                        <div className="flex flex-wrap sm:gap-4">
                                             {items.map(product => (
                                                 <ProductCard key={product.id} product={product} />
                                             ))}
