@@ -1,11 +1,31 @@
 import { PrismaClient } from '@prisma/client';
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+declare global {
+  var prisma: PrismaClient | undefined;
+}
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
+const prismaSingleton = () => {
+  return new PrismaClient({
     log: ['query', 'info', 'warn', 'error'],
   });
+};
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+export const prisma = globalThis.prisma ?? prismaSingleton();
+
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.prisma = prisma;
+}
+
+if (process.env.NODE_ENV === 'development') {
+  process.once('SIGUSR2', async () => {
+    console.log('Disconnecting Prisma before reload (SIGUSR2)...');
+    await prisma.$disconnect();
+    process.kill(process.pid, 'SIGUSR2');
+  });
+
+  process.once('SIGINT', async () => {
+    console.log('Disconnecting Prisma on exit (SIGINT)...');
+    await prisma.$disconnect();
+    process.exit(0); 
+  });
+}

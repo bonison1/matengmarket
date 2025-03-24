@@ -1,14 +1,13 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
-  emitSources     = false  
+  emitSources     = "false"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // Pulls from .env.local
+  url      = env("DATABASE_URL")
 }
-
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model businesses {
@@ -46,20 +45,21 @@ model commission_payout {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model customers {
-  customer_id  String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name         String      @db.VarChar(255)
-  email        String      @unique(map: "customer_email_key")
-  password     String
-  address      String?     @db.VarChar(255)
-  phone        String?     @db.VarChar(20)
-  profile_pic  String?     @default("")
-  whatsapp     String?     @db.VarChar
-  remarks      String?     @db.VarChar
-  order_record Json?       @db.Json
-  created_at   DateTime?   @db.Timestamp(6)
-  updated_at   DateTime?   @db.Timestamp(6)
-  token        String      @unique @db.VarChar
-  order_rec    order_rec[]
+  customer_id                    String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name                           String      @db.VarChar(255)
+  email                          String      @unique(map: "customer_email_key")
+  password                       String
+  address                        String?     @db.VarChar(255)
+  phone                          String?     @db.VarChar(20)
+  profile_pic                    String?     @default("")
+  whatsapp                       String?     @db.VarChar
+  remarks                        String?     @db.VarChar
+  order_record                   Json?       @db.Json
+  created_at                     DateTime?   @db.Timestamp(6)
+  updated_at                     DateTime?   @db.Timestamp(6)
+  token                          String      @unique @db.VarChar
+  order_rec                      order_rec[]
+  ratings_ratings_user_idTousers ratings[]   @relation("ratings_user_idTousers")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -280,6 +280,7 @@ model order_rec {
   is_ordered             Int?         @db.SmallInt
   buyer_id               String?      @db.Uuid
   landmark               String?
+  business_id            String?      @db.Uuid
   order_item             order_item[]
   customers              customers?   @relation(fields: [buyer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -303,13 +304,14 @@ model products {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model ratings {
-  id                                    Int       @id @default(autoincrement())
-  user_id                               String?   @db.Uuid
-  business_user_id                      String?   @db.Uuid
+  id                                    Int        @id @default(autoincrement())
+  user_id                               String?    @db.Uuid
+  business_user_id                      String?    @db.Uuid
   rating                                Int
-  created_at                            DateTime? @default(now()) @db.Timestamptz(6)
-  users_ratings_business_user_idTousers users?    @relation("ratings_business_user_idTousers", fields: [business_user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
-  users_ratings_user_idTousers          users?    @relation("ratings_user_idTousers", fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  created_at                            DateTime?  @default(now()) @db.Timestamptz(6)
+  comment                               String?
+  users_ratings_business_user_idTousers users?     @relation("ratings_business_user_idTousers", fields: [business_user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  users_ratings_user_idTousers          customers? @relation("ratings_user_idTousers", fields: [user_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -426,7 +428,6 @@ model users {
   order_data                                         order_data[]
   products                                           products[]
   ratings_ratings_business_user_idTousers            ratings[]       @relation("ratings_business_user_idTousers")
-  ratings_ratings_user_idTousers                     ratings[]       @relation("ratings_user_idTousers")
   sales_sales_usersTousers                           sales[]         @relation("sales_usersTousers")
   user_contacts_user_contacts_contact_user_idTousers user_contacts[] @relation("user_contacts_contact_user_idTousers")
   user_contacts_user_contacts_link1Tousers           user_contacts[] @relation("user_contacts_link1Tousers")

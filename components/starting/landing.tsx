@@ -32,7 +32,7 @@ export default function Landing() {
   }, [router]);
 
   return (
-    <div className="landing flex flex-col items-center justify-center w-[100vw] h-[100vh]">
+    <div className="landing flex flex-col items-center justify-center w-[100vw] h-[90vh] sm:h-[100vh]">
       <div className={`relative transition-all ${finalAnimation ? "logo-move" : ""}`}>
         <div className={`logo ${finalAnimation ? "shrink" : ""}`}>
           {text.split("").map((char, index) => (

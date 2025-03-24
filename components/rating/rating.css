@@ -1,45 +1,31 @@
 .rating {
   display: flex;
-  flex-direction: row-reverse;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: start;
   font-size: 30px;
+  gap: 4px;
 }
 
-.rating input {
-  display: none;
-}
-
-.rating label {
+.rating .star {
   cursor: pointer;
   transition: all 0.3s ease-in-out;
-  font-size: inherit;
   color: gray;
+  user-select: none;
 }
 
-/* Default star */
-.rating label:before {
-  content: '★';
-  display: inline-block;
-}
-
-/* Hover Effect */
-.rating label:hover,
-.rating label:hover ~ label {
-  background: linear-gradient(to bottom, #6fc902 0%, #d8d830 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Selected stars */
-.rating input:checked ~ label {
+/* Filled Stars - Gradient */
+.rating .star.filled {
   background: linear-gradient(to bottom, #7EE501 0%, #eeee35 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: #e58e09;
+  color: #7EE501; /* Fallback */
 }
 
-/* When hovered over an already selected star */
-.rating input:checked + label:hover,
-.rating input:checked + label:hover ~ label {
-  color: #e58e09;
+/* Hover Effect - Gradient */
+.rating .star.hovered,
+.rating .star:hover {
+  background: linear-gradient(to bottom, #6fc902 0%, #d8d830 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #6fc902; /* Fallback */
 }

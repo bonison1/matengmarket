@@ -277,7 +277,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
 import React, { useEffect, useState } from 'react'
 import ProductCard from '../../../components/product/productCard'
-import ProductBanner from './productBanner'
+import ProductBanner from '../../../components/bannerCard/productBanner'
 import { useTheme } from "next-themes"
 import { CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -287,6 +287,7 @@ import { Search, SlidersHorizontal } from 'lucide-react'
 import { Product } from '@/utils/types/product'
 import { Skeleton } from '@/components/ui/skeleton'
 import Loader from '@/components/loader/loader'
+import { Label } from '@/components/ui/label'
 
 export default function Page() {
     const { setTheme } = useTheme()
@@ -396,17 +397,17 @@ export default function Page() {
                         {/* Banner */}
                         <div className='w-full flex flex-col sm:flex-row relative rounded-2xl mt-6 mb-4'
                             style={{ background: "linear-gradient(323deg, rgba(34,51,29,1) 0%, rgba(71,93,65,1) 100%)" }}>
-                            <div className='w-full sm:w-3/5 flex flex-col gap-3 justify-center p-6 sm:p-0 mb-10 sm:ml-[4.5rem] z-10'>
+                            <div className='w-full sm:w-2/5 md:w-1/2 lg:w-3/5 flex flex-col gap-3 justify-center p-6 sm:p-0 mb-10 sm:ml-10 xl:ml-[4.5rem] z-10'>
                                 <div className='flex flex-col text-2xl md:text-4xl leading-none font-bold text-[#fefce8]'>
                                     <span>Get the very best</span>
                                     <span>products for your home</span>
                                 </div>
-                                <div className='w-full sm:w-1/2 leading-none text-xs sm:text-sm text-gray-200/90'>
+                                <div className='w-full xl:w-1/2 leading-none text-xs sm:text-sm text-gray-200/90'>
                                     <span>Purple raindrops danced on the windowpane during the unexpected summer storm.</span>
                                 </div>
                             </div>
 
-                            <div className='w-full sm:w-2/5 flex justify-center sm:justify-start items-end z-10'>
+                            <div className='w-full sm:w-3/5 md:w-1/2 lg:w-2/5 flex justify-center sm:justify-start items-end z-10'>
                                 <ProductBanner />
                             </div>
 
@@ -425,17 +426,16 @@ export default function Page() {
                         {/* Search + Filter */}
                         <div className='w-full bg-stone-600/0 backdrop-blur-lg sticky top-[4.2rem] z-10 px-4 pt-1 mb-4 rounded-sm'>
                             <div className='flex flex-row justify-end items-center'>
-                                {/* <CardTitle className="text-2xl w-1/2">Products</CardTitle> */}
                                 <div className='flex items-end gap-3'>
                                     <div className="relative">
                                         {/* Mobile View */}
-                                        <div className="sm:hidden h-[2.1rem] flex items-center bg-white rounded-full shadow-sm px-2 sm:px-4 border border-gray-200 transition-all duration-300 ease-in-out"
-                                            style={{ width: mobileSearchOpen ? '14rem' : '2.5rem' }}
+                                        <div className="block z-20 sm:hidden h-[2.1rem] flex items-center bg-white rounded-full shadow-sm px-2 sm:px-4 border border-gray-200 transition-all duration-300 ease-in-out"
+                                            style={{ width: mobileSearchOpen ? '16rem' : '2.4rem' }}
                                         >
                                             {mobileSearchOpen && (
                                                 <input
                                                     type="text"
-                                                    className="flex-1 w-4/5 h-full text-[16px] outline-none bg-transparent placeholder-gray-500"
+                                                    className="flex-1 w-4/5 h-full text-[16px] outline-none bg-transparent placeholder-gray-500 pl-3 "
                                                     placeholder="Search product..."
                                                     value={searchQuery}
                                                     onChange={(e) => handleSearch(e.target.value)}
@@ -477,38 +477,41 @@ export default function Page() {
                                             </Button>
                                         </PopoverTrigger>
 
-                                        <PopoverContent className="w-[22rem] md:w-[32rem] bg-white px-6 space-y-4 rounded-lg shadow-lg border -translate-x-8 sm:-translate-x-25">
+                                        <PopoverContent className="w-[22rem] md:w-[32rem] bg-white px-6 space-y-4 rounded-lg shadow-lg border -translate-x-8 sm:-translate-x-25 ">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-sm font-medium">Filters</span>
+                                                <CardTitle className="text-lg font-medium text-stone-500">Apply Filters</CardTitle>
                                                 <Button variant="destructive" size="sm" onClick={clearFilters}>
                                                     Clear
                                                 </Button>
                                             </div>
 
+                                            <Label>Sort by</Label>
                                             <div className="space-y-2">
-                                                <p className="text-sm font-semibold">Sort by</p>
                                                 <div className="flex flex-col gap-1">
                                                     <Button variant={sort === 'asc' ? 'default' : 'outline'} size="sm" onClick={() => handleSort('asc')}> Price: Low to High </Button>
                                                     <Button variant={sort === 'desc' ? 'default' : 'outline'} size="sm" onClick={() => handleSort('desc')}> Price: High to Low </Button>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-2">
-                                                <p className="text-sm font-semibold">Category</p>
-                                                <div className="grid sm:grid-cols-2 gap-2">
-                                                    {categories.map((cat) => (
-                                                        <Button
-                                                            key={cat}
-                                                            variant={category === cat ? 'default' : 'outline'}
-                                                            size="sm"
-                                                            onClick={() => handleFilterChange(cat)}
-                                                            className='capitalize truncate '
-                                                        >
-                                                            {cat}
-                                                        </Button>
-                                                    ))}
+                                            <Label>Category</Label>
+                                            <ScrollArea>
+
+                                                <div className="space-y-2 h-90 mr-4">
+                                                    <div className="grid sm:grid-cols-2 gap-2">
+                                                        {categories.map((cat) => (
+                                                            <Button
+                                                                key={cat}
+                                                                variant={category === cat ? 'default' : 'outline'}
+                                                                size="sm"
+                                                                onClick={() => handleFilterChange(cat)}
+                                                                className='capitalize truncate '
+                                                            >
+                                                                {cat}
+                                                            </Button>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </ScrollArea>
                                         </PopoverContent>
                                     </Popover>
                                 </div>
@@ -533,8 +536,8 @@ export default function Page() {
                             ) : filteredProducts.length > 0 ? (
                                 Object.entries(groupedProducts).map(([group, items]) => (
                                     <div key={group}>
-                                        <CardTitle className="w-fit text-2xl font-semibold mb-4 capitalize sticky top-[4.4rem] z-10 px-4">{group}</CardTitle>
-                                        <div className="flex flex-wrap sm:gap-4">
+                                        <CardTitle className="w-fit text-2xl font-semibold mb-4 capitalize sticky top-[4.4rem] z-11 px-4">{group}</CardTitle>
+                                        <div className="flex flex-wrap md:gap-1 lg:gap-4">
                                             {items.map(product => (
                                                 <ProductCard key={product.id} product={product} />
                                             ))}

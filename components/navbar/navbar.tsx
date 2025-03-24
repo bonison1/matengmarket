@@ -61,11 +61,11 @@ function Navbar() {
         <div className='w-full absolute top-0 z-100 sm:px-4 bg-gradient-to-r from-[#131316d9] via-[#222226a6] to-[#131316d9] backdrop-blur-sm'>
 
             <div className='navbar flex justify-between items-center h-16'>
-                <div className="h-16 flex items-center justify-center p-2">
+                <div className="h-16 flex items-center justify-center p-2 pl-0">
                     <img src="../logo.png" alt="logo" className="h-full object-contain" />
                 </div>
 
-                <div className="menu-bar inline-flex gap-3 items-center ">
+                <div className="menu-bar inline-flex gap-1 lg:gap-3 items-center ">
                     {links.map((link) => (
                         <span
                             key={link.href}
@@ -100,8 +100,8 @@ function Navbar() {
                                         </span>
                                     </div>
                                 </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Go to Cart</p>
+                                <TooltipContent className='z-1000'>
+                                    <p className='text-white'>Go to Cart</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -144,15 +144,15 @@ function Navbar() {
                                             </span>
                                         </div>
                                     </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Go to Cart</p>
+                                    <TooltipContent className='z-1000'>
+                                    <p className='text-white'>Go to Cart</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
 
                         </Link>
 
-                        <label className="hamburger">
+                        <label className="hamburger pr-3">
                             <input
                                 type="checkbox"
                                 className="hamburger-checkbox"

@@ -191,7 +191,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
 
     return (
         <>
-            <div className="poppins w-1/2 h-[22rem] sm:w-[320px] sm:h-[470px] flex flex-col bg-transparent border-r border-b p-2 sm:p-4 pt-0 mb-6 sm:mb-0 sm:m-1">
+            <div className="poppins w-1/2 h-[22rem] sm:w-[32%] md:w-[31%] md:h-[26rem] lg:w-[320px] lg:h-[470px] flex flex-col bg-transparent border-r border-b p-2 sm:p-4 pt-0 mb-6 sm:mb-0 sm:m-1">
                 {/* Image container */}
                 <div
                     className="bg-gray-300 w-full h-3/4 rounded-xl overflow-hidden relative cursor-pointer"
@@ -233,7 +233,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
                         {/* <CardDescription className="text-[#4C4646]">Quantity: {product.quantity}</CardDescription> */}
                     </div>
 
-                    <div className="flex flex-col-reverse sm:flex-row  justify-between gap-2">
+                    <div className="flex flex-col-reverse lg:flex-row  justify-between gap-2">
                         {/* {Number(product.quantity ?? 0) > 0 ? (
                             <Button
                                 className="bg-gradient-to-b from-[#38D932] to-[#12850E]"
@@ -257,7 +257,7 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
                         </Button>
 
                         {isInCart && (
-                            <div className="flex items-center justify-between text-[#624b4b] w-full sm:w-32 h-8 border rounded-md shadow-md bg-neutral-100/70 text-gray-900">
+                            <div className="flex items-center justify-between text-[#624b4b] w-full md:w-44 lg:w-32 h-8 border rounded-md shadow-md bg-neutral-100/70 text-gray-900">
                                 <button
                                     className="px-4 sm:px-2 border-r border-[#C3C2B6]"
                                     onClick={handleDecreaseQuantity}

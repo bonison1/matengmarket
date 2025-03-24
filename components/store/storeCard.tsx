@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Rating from '@/components/rating/rating';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image'
 import "./storeCard.css"
 
 interface StoreCardProps {
@@ -43,24 +44,25 @@ export default function StoreCard({ store }: StoreCardProps) {
 
 
     return (
-        <div className='p-4 sm:p-8 md:p-10 poppins'>
-            <div className="store-card h-[325px] w-[250px] sm:w-[300px] md:h-[430px]">
+        <div className='mb-8 sm:mb-0 p-4 sm:p-8 md:p-10 poppins'>
+            <div className="store-card w-[256px] h-[380px]  lg:w-[320px] lg:h-[470px]">
                 <div className="content">
-                    <img
-                        src={store.photo || "/placeholder.jpg"}
+                    <Image
+                        width={600}
+                        height={600}
+                        src={store.photo || "/unavailable.jpg"}
                         alt={store.business_name}
-                        className='object-cover rounded-lg'
-                        style={{ height: "70%", width: "100%" }}
-                        onError={(e) => { e.currentTarget.src = "./unavailable.jpg"; }}
+                        className='object-cover rounded-lg h-[70%] w-full'
+                        onError={(e) => { e.currentTarget.src = "/unavailable.jpg"; }}
                         onClick={handleNavigate}
+                        loading='lazy'
                     />
                     <div className="w-full flex flex-col items-center mt-3 gap-1">
-                        <span className="title text-black text-xl font-semibold b-0 capitalize">
+                        <span className="title text-black text-lg lg:text-xl font-semibold b-0 text-center leading-none capitalize">
                             {store.business_name ? store.business_name : "Not Available"}
                         </span>
                         <span
-                            className="text-[#00000066] text-sm font-semibold flex items-center justify-center text-center max-w-[90%] capitalize"
-                            style={{ height: '2em' }}
+                            className="h-6 text-[#00000066] text-xs lg:text-sm font-semibold flex items-center justify-center text-center max-w-[90%] leading-none capitalize"
                         >
                             {store.business_type ? store.business_type : "Not Available"}
                         </span>
@@ -69,15 +71,15 @@ export default function StoreCard({ store }: StoreCardProps) {
                             {store.product_service}
                         </span> */}
 
-                        <div className='w-full h-12 flex justify-between items-center p-2'>
+                        <div className='w-full h-12 flex justify-between items-center p-2 pt-1'>
                             <div className='flex flex-col leading-none'>
                                 <span className='text-sm font-medium text-[#9D9898CC] pl-1 translate-y-0.5 hover:text-[#9D9898]'>Rating</span>
                                 <Rating rating={store.ratings} editable={false} size={starSize} />
                             </div>
-                            <div>
+                            <div className='relative'>
                                 <button
                                     type="submit"
-                                    className="flex justify-center gap-2 items-center mx-auto shadow-md text-sm text-gray-800 bg-gray-200 backdrop-blur-md lg:font-medium isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-emerald-500 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-3.5 py-1.5 overflow-hidden border-2 rounded-full group"
+                                    className="flex justify-center gap-2 items-center mx-auto shadow-md text-sm text-gray-800 bg-gray-200 backdrop-blur-md lg:font-medium isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-500 hover:before:w-full before:right-full hover:before:right-0 before:rounded-full before:bg-emerald-400 hover:text-gray-50 before:-z-10 before:aspect-square hover:before:scale-150 hover:before:duration-500 relative z-10 px-3.5 py-1.5 overflow-hidden border-2 rounded-full group"
                                     onClick={handleNavigate}
                                 >
                                     Details

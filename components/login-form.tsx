@@ -60,7 +60,7 @@ export function LoginForm({ className, setIsLogin, ...props }: { className?: str
             </div>
           </div>
 
-          <Card className="p-8 backdrop-blur-[15px] backdrop-saturate-[130%] bg-[rgba(28, 29, 27, 0.75)]">
+          <Card className="p-8">
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="emailOrPhone">Email or Phone</Label>
@@ -90,7 +90,7 @@ export function LoginForm({ className, setIsLogin, ...props }: { className?: str
                 />
               </div>
 
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full text-white">
                 Login
               </Button>
 
