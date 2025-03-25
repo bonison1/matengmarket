@@ -42,7 +42,7 @@ export default function page() {
     <div className="w-[100vw] h-[100svh]">
 
       <div className="h-full text-center text-5xl font-bold text-white pt-20 flex flex-col justify-start items-center gap-10">
-        <div className="flex flex-col sm:flex-row gap-1 sm:gap-0 text-5xl sm:text-[2.5rem] md:text-[3rem] lg:text-[4rem] text-transparent bg-gradient-to-b from-white to-gray-400 bg-clip-text z-20 mt-[20%] sm:mt-[6%] animate-fade-in">
+        <div className="flex flex-col sm:flex-row gap-1 sm:gap-0 text-5xl sm:text-[2.5rem] md:text-[3rem] lg:text-[4rem] text-transparent bg-gradient-to-b from-white to-gray-400 bg-clip-text z-20 mt-[20%] md:mt-[16%] lg:mt-[8%] animate-fade-in">
           <span>We Drive,</span>
           <span> We Discover</span>
         </div>
@@ -66,7 +66,7 @@ export default function page() {
           </div>
         </div>
 
-        <div className="z-20 flex flex-col sm:flex-row gap-8 sm:gap-10 mt-[8%] sm:mt-0">
+        <div className="z-20 flex flex-col sm:flex-row gap-8 sm:gap-10 mt-[4%] sm:mt-0">
           <button
             className="relative inline-flex items-center gap-2 px-8 py-3 font-semibold text-teal-50 bg-gradient-to-tr from-amber-200/60 via-amber-300/70 to-amber-300/80 ring-4 ring-amber-200/25 rounded-full overflow-hidden hover:opacity-95 transition-opacity before:absolute before:top-4 before:left-1/2 before:-translate-x-1/2 before:w-[100px] before:h-[100px] before:rounded-full before:bg-gradient-to-b before:from-teal-50/10 before:blur-xl text-base animate-arrow"
           >

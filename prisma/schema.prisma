@@ -58,6 +58,7 @@ model customers {
   created_at                     DateTime?   @db.Timestamp(6)
   updated_at                     DateTime?   @db.Timestamp(6)
   token                          String      @unique @db.VarChar
+  dob                            DateTime?   @db.Date
   order_rec                      order_rec[]
   ratings_ratings_user_idTousers ratings[]   @relation("ratings_user_idTousers")
 }
@@ -261,6 +262,8 @@ model order_item {
   added_at     DateTime?    @db.Timestamp(6)
   order_rec    order_rec?   @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
   new_products new_products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([order_id, product_id], name: "unique_id", map: "unique_id")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -278,9 +281,9 @@ model order_rec {
   total_calculated_price Decimal?     @db.Decimal(10, 2)
   item_count             Int?         @db.SmallInt
   is_ordered             Int?         @db.SmallInt
-  buyer_id               String?      @db.Uuid
   landmark               String?
-  business_id            String?      @db.Uuid
+  buyer_id               String?      @db.Uuid
+  store_ids              String[]     @db.Uuid
   order_item             order_item[]
   customers              customers?   @relation(fields: [buyer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
 }

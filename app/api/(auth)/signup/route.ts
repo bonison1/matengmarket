@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
+import bcrypt from 'bcryptjs';
 
 export const POST = async (req: NextRequest) => {
   try {
-    const { name, email, password, address, phone, whatsapp } = await req.json();
+    const { name, email, password, address, phone, whatsapp, dob } = await req.json();
 
     const existingUser = await prisma.customers.findFirst({
       where: {
@@ -13,51 +14,84 @@ export const POST = async (req: NextRequest) => {
     });
 
     if (existingUser) {
-      return NextResponse.json({ success: false, message: 'Email or Phone already registered.' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'Email or Phone already registered.' },
+        { status: 400 }
+      );
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10); 
 
     const newCustomer = await prisma.customers.create({
       data: {
         name,
+        dob: dob ? new Date(dob) : undefined,
         email,
-        password,
+        password: hashedPassword,
         address,
         phone,
         whatsapp,
         token: crypto.randomUUID(),
         created_at: new Date(),
-        // updated_at stays null
       },
     });
 
-    // ✅ Send Email if email is provided
-    // if (email) {
-    //   await sendSignupEmail(email, name);
-    // }
+    // Send Email if email is provided
+    if (email) {
+      await sendSignupEmail(email, name);
+    }
 
-    return NextResponse.json({ success: true, data: newCustomer }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          customer_id: newCustomer.customer_id,
+          token: newCustomer.token,
+        },
+      },
+      { status: 201 }
+    );
   } catch (error: any) {
     console.error('Signup Error:', error);
-    return NextResponse.json({ success: false, message: error.message || 'Signup failed' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message || 'Signup failed' },
+      { status: 500 }
+    );
   }
 };
 
-// ✅ Email sending function
+// Email sending function
 const sendSignupEmail = async (toEmail: string, name: string) => {
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-      user: 'your-email@gmail.com',    
-      pass: 'your-app-password',        
+      user: 'clintonlai.lms@gmail.com',
+      pass: 'woiw tzei pcnx duke',
     },
   });
 
   const mailOptions = {
-    from: '"Your App Name" <your-email@gmail.com>',
+    from: '"testing" <clintonlai.lms@gmail.com>',
     to: toEmail,
-    subject: 'Welcome to Our Platform!',
-    html: `<p>Hi ${name},</p><p>Thank you for signing up! We're excited to have you on board.</p>`,
+    subject: 'Welcome to Mateng - Start Shopping Today!',
+    html: `
+      <p>Hi ${name},</p>
+
+      <p>Thank you for signing up with us!</p>
+
+      <p>We're excited to have you join our mateng community. Explore a wide range of products, place orders easily, and enjoy a seamless shopping experience.</p>
+
+      <p>Happy Shopping!</p>
+
+      <p>Best regards,<br/>
+      The Mateng Team</p>
+    `,
   };
 
-  await transporter.sendMail(mailOptions);
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Failed to send signup email:", error);
+  }
 };

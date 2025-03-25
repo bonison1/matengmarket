@@ -38,7 +38,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="w-[100vw] h-[100vh] custom-bg relative">
+          <div className="w-[100vw] h-[100svh] custom-bg relative">
             <div className="lines">
               <div className="line"></div>
               <div className="line"></div>

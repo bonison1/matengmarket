@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export const POST = async (req: NextRequest) => {
   try {
     const { emailOrPhone, password } = await req.json();
 
-    // Find customer by email or phone
     const customer = await prisma.customers.findFirst({
       where: {
         OR: [
@@ -16,20 +16,22 @@ export const POST = async (req: NextRequest) => {
     });
 
     if (!customer) {
-      return NextResponse.json({ success: false, message: 'Customer not found' }, { status: 404 });
+      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
     }
 
-    if (customer.password !== password) {
+    const isPasswordValid = await bcrypt.compare(password, customer.password);
+
+    if (!isPasswordValid) {
       return NextResponse.json({ success: false, message: 'Invalid password' }, { status: 401 });
     }
 
-    // Return only required fields (customer_id and token)
     return NextResponse.json(
       {
         success: true,
         data: {
           customer_id: customer.customer_id,
           token: customer.token,
+          name: customer.name,
         },
       },
       { status: 200 }

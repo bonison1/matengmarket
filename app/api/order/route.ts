@@ -9,24 +9,70 @@ const generateOrderId = () => `ORD-${Date.now()}`;
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { buyer_id, ...rest } = body;
-
-    if (!buyer_id) {
-      return NextResponse.json({ success: false, message: 'buyer_id is required' }, { status: 400 });
-    }
+    const { 
+      buyer_id, 
+      item_list, 
+      buyer_name = "", 
+      buyer_address = "", 
+      buyer_phone = "" 
+    } = body;
 
     const newOrder = await prisma.order_rec.create({
       data: {
         order_id: generateOrderId(),
-        buyer_id,
+        buyer_id: buyer_id || null,
         is_ordered: 0,
-        ...rest,
+        buyer_name,
+        buyer_address,
+        buyer_phone,
+        item_list: item_list || []
       },
     });
 
-    return NextResponse.json({ success: true, data: newOrder }, { status: 201 });
+    return NextResponse.json({ 
+      success: true, 
+      data: { order_id: newOrder.order_id }
+    }, { status: 201 });
   } catch (error) {
-    console.error('❌ Error creating order:', error);
+    console.error('Error creating order:', error);
+    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+  }
+};
+
+// ✅ PUT - Update Existing Order
+export const PUT = async (req: NextRequest) => {
+  try {
+    const body = await req.json();
+    const { 
+      order_id,
+      buyer_id, 
+      item_list, 
+      buyer_name = "", 
+      buyer_address = "", 
+      buyer_phone = "" 
+    } = body;
+
+    if (!order_id) {
+      return NextResponse.json({ success: false, message: 'order_id is required' }, { status: 400 });
+    }
+
+    const updatedOrder = await prisma.order_rec.update({
+      where: { order_id },
+      data: {
+        buyer_id: buyer_id || null,
+        buyer_name,
+        buyer_address,
+        buyer_phone,
+        item_list: item_list || []
+      },
+    });
+
+    return NextResponse.json({ 
+      success: true, 
+      data: { order_id: updatedOrder.order_id }
+    }, { status: 200 });
+  } catch (error) {
+    console.error('Error updating order:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
   }
 };
@@ -40,7 +86,7 @@ export const GET = async () => {
     });
     return NextResponse.json({ success: true, data: orders }, { status: 200 });
   } catch (error) {
-    console.error('❌ Error fetching orders:', error);
+    console.error('Error fetching orders:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
   }
 };

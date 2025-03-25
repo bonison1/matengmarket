@@ -107,12 +107,12 @@ function Navbar() {
                         </TooltipProvider>
 
                     </Link>
-                    <Link href="/login">
+                    <Link href={`/login?redirect=${encodeURIComponent(pathname)}`}>
                         <button className="cartBtn rounded-full p-0.5 text-[0.95rem] leading-none">
                             <div className="button-overlay"></div>
-                            <span className='rounded-full py-2 px-6 gap-1'>
+                            <span className="rounded-full py-2 px-6 gap-1">
                                 Login
-                                <ArrowRight size={18} className='text-white' />
+                                <ArrowRight size={18} className="text-white" />
                             </span>
                         </button>
                     </Link>
@@ -124,7 +124,7 @@ function Navbar() {
                     <img src="../logo.png" alt="logo" style={{ width: '9rem' }} />
 
                     <div className='flex flex-row gap-4 z-1000'>
-                        <Link href="/cart">
+                        <Link href="/cart" onClick={() => setNavOpen(false)}>
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger>
@@ -145,7 +145,7 @@ function Navbar() {
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent className='z-1000'>
-                                    <p className='text-white'>Go to Cart</p>
+                                        <p className='text-white'>Go to Cart</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
@@ -200,15 +200,16 @@ function Navbar() {
                             Delivery Rates
                         </Link>
 
-                        <Link href="/login" onClick={closedNav}>
-                            <button className="cartBtn rounded-full p-0.5 text-[0.95rem] leading-none mt-10">
-                                <div className="button-overlay rounded-full"></div>
-                                <span className='rounded-full py-2 px-6 gap-1'>
+                        <Link href={`/login?redirect=${encodeURIComponent(pathname)}`} onClick={closedNav}>
+                            <button className="cartBtn rounded-full p-0.5 text-[0.95rem] mt-10 leading-none">
+                                <div className="button-overlay"></div>
+                                <span className="rounded-full py-2 px-6 gap-1">
                                     Login
-                                    <ArrowRight size={18} className='text-white' />
+                                    <ArrowRight size={18} className="text-white" />
                                 </span>
                             </button>
                         </Link>
+
                     </div>
                 </nav>
             </div>
