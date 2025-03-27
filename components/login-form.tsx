@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux"; 
+import { AppDispatch } from "@/lib/cart/store"; 
+import { setUser } from "@/lib/cart/userSlice"; 
 import { GalleryVerticalEnd, BellRing } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -10,9 +13,25 @@ import { Label } from "@/components/ui/label";
 import { Card } from "./ui/card";
 import { toast } from "sonner";
 import DatePicker from "@/components/ui/date-picker";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { format } from 'date-fns'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { format } from "date-fns";
+
 interface LoginFormProps {
   className?: string;
   setIsLogin: (val: boolean) => void;
@@ -24,10 +43,10 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>(); 
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [dob, setDob] = useState<Date | null>(null);
   const [newPassword, setNewPassword] = useState("");
-
   const [forgotDialogOpen, setForgotDialogOpen] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -44,19 +63,24 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
       const data = await res.json();
 
       if (res.ok) {
-        const { customer_id, token, name } = data.data;
-        localStorage.setItem("customer_id", customer_id);
-        localStorage.setItem("token", token);
+        const userData = data.data; 
+        
+        // Save to localStorage
+        localStorage.setItem("customer_id", userData.customer_id);
+        localStorage.setItem("token", userData.token);
+
+        // Save to Redux store
+        dispatch(setUser(userData));
 
         const existingOrderId = localStorage.getItem("order_id");
 
         if (!existingOrderId) {
           try {
-            const orderRes = await fetch(`/api/order/buyer/${customer_id}`, {
+            const orderRes = await fetch(`/api/order/buyer/${userData.customer_id}`, {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                // "Authorization": `Bearer ${token}`,
+                // "Authorization": `Bearer ${userData.token}`,
               },
             });
 
@@ -70,7 +94,7 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
           }
         }
 
-        toast.success(`Welcome back, ${name}!`, { position: "top-right" });
+        toast.success(`Welcome back, ${userData.name}!`, { position: "top-right" });
         router.push(redirect || "/home");
       } else {
         toast.error(data.message || "Login failed");

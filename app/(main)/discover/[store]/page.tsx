@@ -171,7 +171,7 @@ export default function Page() {
   }
 
   return (
-    <div className="bg-[#efeee7] min-h-screen flex flex-col items-center justify-start relative poppins">
+    <div className="bg-[#efeee7] flex flex-col items-center justify-start relative poppins">
       <ScrollArea>
         <div className="h-[100svh]">
           {/* Store Cover */}

@@ -1,9 +1,11 @@
-'use client'
+'use client';
 
 import Navbar from "@/components/navbar/navbar";
 import { Provider } from "react-redux";
 import { store } from "@/lib/cart/store";
 import CartLoader from "@/components/cart-loader";
+import UserLoader from "@/components/user-loader";
+import StorageWatcher from "@/components/storage-watcher"; 
 
 export default function MainLayout({
   children,
@@ -13,7 +15,9 @@ export default function MainLayout({
   return (
     <>
       <Provider store={store}>
-        <CartLoader/>
+        <UserLoader />
+        <CartLoader />
+        <StorageWatcher />
         <Navbar />
         {children}
       </Provider>

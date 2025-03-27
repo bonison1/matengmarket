@@ -36,18 +36,16 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
-    // Send Email if email is provided
     if (email) {
       await sendSignupEmail(email, name);
     }
 
+    const { password: _, ...customerData } = newCustomer;
+
     return NextResponse.json(
       {
         success: true,
-        data: {
-          customer_id: newCustomer.customer_id,
-          token: newCustomer.token,
-        },
+        data: customerData,
       },
       { status: 201 }
     );

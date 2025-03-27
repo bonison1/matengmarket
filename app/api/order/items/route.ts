@@ -91,7 +91,8 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-// ✅ GET - Fetch Order Items
+
+
 export const GET = async (req: NextRequest) => {
   try {
     const url = new URL(req.url);
@@ -104,9 +105,49 @@ export const GET = async (req: NextRequest) => {
     const orderItems = await prisma.order_item.findMany({
       where: { order_id },
       orderBy: { added_at: 'asc' },
+      include: {
+        new_products: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            price_inr: true,
+            discounted_price: true,
+            media_urls: true,
+            unit_quantity: true,
+            user_name: true,
+          },
+        },
+      },
     });
 
-    return NextResponse.json({ success: true, data: orderItems }, { status: 200 });
+    // Transform the data to match your cart item structure
+    const enrichedItems = orderItems.map(item => ({
+      id: item.new_products.id,
+      name: item.new_products.name,
+      price_inr: Number(item.new_products.price_inr), // Convert Decimal to number
+      discounted_price: Number(item.new_products.discounted_price || item.new_products.price_inr),
+      quantity: item.quantity,
+      media_urls: item.new_products.media_urls,
+      unit_quantity: item.new_products.unit_quantity,
+      user_name: item.new_products.user_name,
+      description: item.new_products.description || '',
+      itemPrice: Number(item.new_products.discounted_price || item.new_products.price_inr),
+      originalPrice: Number(item.new_products.price_inr),
+    }));
+
+    // Calculate totals
+    const totalPrice = enrichedItems.reduce((sum, item) => sum + item.itemPrice * item.quantity, 0);
+    const totalOriginalPrice = enrichedItems.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0);
+
+    // Construct cart-like response
+    const cartData = {
+      items: enrichedItems,
+      totalPrice,
+      totalOriginalPrice,
+    };
+
+    return NextResponse.json({ success: true, data: cartData }, { status: 200 });
   } catch (error) {
     console.error('❌ Error fetching order items:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });

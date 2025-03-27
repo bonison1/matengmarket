@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
 // Generate Unique Order ID
-const generateOrderId = () => `ORD-${Date.now()}`;
+const generateOrderId = () => `ORD-${Date.now()}${Math.floor(Math.random() * 90 + 10)}`;
 
 // ✅ POST - Create New Order
 export const POST = async (req: NextRequest) => {

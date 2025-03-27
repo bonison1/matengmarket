@@ -82,7 +82,7 @@ export default function Page() {
     const categories = ["Fruits", "Vegetables", "Dairy", "Beverages", "Snacks", "Frozen Food", "Bakery", "Pet Food"];
 
     return (
-        <div className='bg-[#efeee7] h-screen relative'>
+        <div className='bg-[#efeee7] relative'>
             <ScrollArea>
                 <div className='w-[100vw] h-[100svh] relative'>
                     <div className='w-full h-16 bg-stone-600'></div>

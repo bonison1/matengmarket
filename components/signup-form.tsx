@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux"; 
+import { AppDispatch } from "@/lib/cart/store"; 
+import { setUser } from "@/lib/cart/userSlice"; 
 import { GalleryVerticalEnd } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -11,7 +14,7 @@ import { Card } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
 import { toast } from "sonner";
 import DatePicker from "@/components/ui/date-picker";
-import { format } from 'date-fns'
+import { format } from 'date-fns';
 
 interface SignupFormProps {
   className?: string;
@@ -21,6 +24,7 @@ interface SignupFormProps {
 
 export function SignupForm({ className, setIsLogin, redirect, ...props }: SignupFormProps) {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>(); 
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +35,6 @@ export function SignupForm({ className, setIsLogin, redirect, ...props }: Signup
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [loading, setLoading] = useState(false);
-
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
@@ -59,8 +62,6 @@ export function SignupForm({ className, setIsLogin, redirect, ...props }: Signup
 
     const dobFormatted = dob ? format(dob, 'yyyy-MM-dd') : null;
 
-    // console.log(JSON.stringify({ name, dobFormatted, email, password, address, phone, whatsapp: null }))
-
     try {
       const res = await fetch('/api/signup', {
         method: 'POST',
@@ -79,20 +80,22 @@ export function SignupForm({ className, setIsLogin, redirect, ...props }: Signup
       if (!res.ok) {
         toast.error(data.message || "Signup failed");
       } else {
-        toast.success("Signup successful!", { position: "top-right" });
-
         localStorage.setItem("customer_id", data.data.customer_id);
         localStorage.setItem("token", data.data.token);
 
-        router.push(redirect || "/home");
+        dispatch(setUser(data.data));
+
+        toast.success("Signup successful!", { position: "top-right" });
 
         setEmail("");
         setPassword("");
         setName("");
         setPhone("");
         setAddress("");
-      }
+        setDob(null);
 
+        router.push(redirect || "/home");
+      }
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
     } finally {

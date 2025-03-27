@@ -25,14 +25,13 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ success: false, message: 'Invalid password' }, { status: 401 });
     }
 
+    // Return all customer fields except password
+    const { password: _, ...customerData } = customer;
+
     return NextResponse.json(
       {
         success: true,
-        data: {
-          customer_id: customer.customer_id,
-          token: customer.token,
-          name: customer.name,
-        },
+        data: customerData,
       },
       { status: 200 }
     );

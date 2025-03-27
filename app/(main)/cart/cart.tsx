@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, Trash2, Minus, Plus } from "lucide-react";
 import Image from 'next/image'
 import { Label } from "@/components/ui/label";
+import Link from 'next/link';
 
 const Cart: React.FC = () => {
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const Cart: React.FC = () => {
   const totalDiscount = totalOriginalPrice - totalPrice;
 
   return (
-    <div className="max-w-6xl mx-auto p-2 sm:p-6">
+    <div className="max-w-6xl mx-auto p-2 sm:p-6 poppins">
       <Label className="text-2xl font-bold mb-4 sm:mb-6">🛒 Shopping Cart</Label>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -105,20 +106,24 @@ const Cart: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between text-base">
-              <p>Total MRP</p>
-              <p>₹{totalOriginalPrice.toFixed(2)}</p>
+              <Label>Total MRP</Label>
+              <CardDescription className="text-stone-800">₹{totalOriginalPrice.toFixed(2)}</CardDescription>
             </div>
             <div className="flex justify-between text-base">
-              <p>Discount</p>
-              <p className="text-green-600">-₹{totalDiscount > 0 ? totalDiscount.toFixed(2) : "0.00"}</p>
+              <Label>Discount</Label>
+              <CardDescription className="text-green-600">-₹{totalDiscount > 0 ? totalDiscount.toFixed(2) : "0.00"}</CardDescription>
             </div>
             <div className="border-t pt-4 flex justify-between text-lg font-semibold">
-              <p>Grand Total</p>
+              <CardTitle>Grand Total</CardTitle>
               <p>₹{totalPrice.toFixed(2)}</p>
             </div>
-            <Button className="mt-4 w-full bg-gradient-to-t from-stone-900 to-stone-700" disabled={items.length === 0}>
-              <ShoppingCart size={18} className="mr-2" /> Proceed to Checkout
-            </Button>
+            <div className="w-full flex justify-center">
+              <Link href="/cart/address">
+              <Button className="mt-4 w-fit bg-gradient-to-t from-[#0752ef] to-[#437fff] text-[#FAF9F6] font-semibold ">
+                <ShoppingCart size={18} className="mr-2 ml-4" /> <span className="mr-4">Proceed to Checkout</span> 
+              </Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
