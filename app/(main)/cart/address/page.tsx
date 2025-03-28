@@ -9,18 +9,28 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTheme } from "next-themes";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/cart/store';
-import { MapPinHouse } from 'lucide-react';
+import { MapPinHouse, Loader2 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import TruckAnimation from '@/components/order/TruckAnimation';
 import CheckmarkCircle from '@/components/order/CheckmarkCircle';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useRouter } from 'next/navigation';
+import { toast } from "sonner";
+import { useDispatch } from 'react-redux';
+import Link from 'next/link';
+import { hydrateCart } from '@/lib/cart/cartSlice';
+import { jsPDF } from 'jspdf'; 
+import { format } from 'date-fns';
+
 
 export default function AddressPage() {
   const { setTheme } = useTheme();
+  const dispatch = useDispatch();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTruckAnimationDone, setIsTruckAnimationDone] = useState(false);
   const [isCheckmarkVisible, setIsCheckmarkVisible] = useState(false);
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false); // Disable button during animation
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setTheme("light");
@@ -58,28 +68,161 @@ export default function AddressPage() {
     console.log('Form submitted', formData);
   };
 
-  const handlePlaceOrder = () => {
-    setIsDialogOpen(true);
-    setIsPlacingOrder(true); // Disable button
+  const handlePlaceOrder = async () => {
+    setIsPlacingOrder(true);
+    const orderId = localStorage.getItem('order_id');
 
-    // Start truck animation first
-    setIsTruckAnimationDone(false);
-    setIsCheckmarkVisible(false);
+    try {
+      const orderData = {
+        order_id: orderId,
+        buyer_name: formData.name,
+        buyer_address: formData.buyerAddress,
+        buyer_phone: formData.buyerPhone,
+        landmark: formData.landmark,
+        email: formData.email,
+        order_at: new Date(new Date().getTime() + (5.5 * 60 * 60 * 1000)).toISOString(),
+        status: 'ordered',
+        items: cart.items.map(item => ({
+          product_id: item.id,
+          product_name: item.name,
+          quantity: item.quantity,
+          price: item.itemPrice,
+        })),
+      };
 
-    setTimeout(() => {
-      setIsTruckAnimationDone(true);
-    }, 4000); // Duration of TruckAnimation
+      const response = await fetch('/api/order/placeOrder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
 
-    setTimeout(() => {
-      setIsCheckmarkVisible(true);
-    }, 3500); // Show checkmark after TruckAnimation completes
+      if (!response.ok) {
+        throw new Error('Failed to place order');
+      }
 
-    setTimeout(() => {
-      setIsDialogOpen(false);
+      const result = await response.json(); 
+      const orderResponse = result.data;
+      console.log(orderResponse)
+
+      localStorage.removeItem('order_id');
+      localStorage.removeItem('cart');
+
+      dispatch(hydrateCart({ items: [], totalPrice: 0, totalOriginalPrice: 0 }));
+
+      setIsDialogOpen(true);
+      setIsTruckAnimationDone(false);
+      setIsCheckmarkVisible(false);
+
+      // try {
+      //   generateReceiptPDF(orderResponse);
+      // } catch (pdfError) {
+      //   console.error('Error generating PDF receipt:', pdfError);
+      // }
+      cleanExtraOrder();
+
+      setTimeout(() => {
+        setIsTruckAnimationDone(true);
+      }, 4000);
+      setTimeout(() => {
+        setIsCheckmarkVisible(true);
+      }, 3500);
+
+      setTimeout(() => {
+        setIsDialogOpen(false);
+        router.push('/');
+      }, 5500);
+    } catch (error) {
+      console.error('Error placing order:', error);
+      toast.error('Failed to place order. Please try again.', {
+        position: "top-right",
+      });
       setIsPlacingOrder(false);
-    }, 5500); // Close the dialog after everything
+    }
   };
 
+  const cleanExtraOrder = () => {
+    const buyer_id = localStorage.getItem('customer_id');
+    if (buyer_id) {
+      fetch(`/api/order/removeOrder?buyer_id=${buyer_id}`, {
+        method: 'DELETE',
+      })
+        .then(response => {
+          if (!response.ok) {
+            console.error('');
+          }
+        })
+        .catch(error => {
+          console.error('', error);
+        });
+    }
+  };
+
+  // Function to generate and download the PDF receipt
+  const generateReceiptPDF = (orderData: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let y = 20;
+
+    // Header
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Mateng - Thank You for Ordering", pageWidth / 2, y, { align: "center" });
+    y += 15;
+
+    // Order Details
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Order ID: ${orderData.order_id}`, 20, y);
+    y += 8;
+    doc.text(`Buyer Name: ${orderData.buyer_name}`, 20, y);
+    y += 8;
+    doc.text(`Address: ${orderData.buyer_address}`, 20, y);
+    y += 8;
+    doc.text(`Phone: ${orderData.buyer_phone}`, 20, y);
+    y += 8;
+    doc.text(`Email: ${orderData.email}`, 20, y);
+    y += 8;
+    doc.text(`Status: ${orderData.status}`, 20, y);
+    y += 8;
+    doc.text(`Landmark: ${orderData.landmark}`, 20, y);
+    y += 8;
+    const formattedDate = format(new Date(orderData.order_at), "dd MMM, yyyy - h:mm a");
+    doc.text(`Order Date: ${formattedDate}`, 20, y);
+    y += 15;
+
+    // Product Table Header
+    doc.setFont("helvetica", "bold");
+    doc.text("Product Name", 20, y);
+    doc.text("Quantity", 80, y);
+    doc.text("MRP Price", 110, y);
+    y += 5;
+    doc.line(20, y, 190, y);
+    y += 8;
+
+    // Product Table Rows
+    doc.setFont("helvetica", "normal");
+    orderData.item_list.forEach((item: any) => {
+      doc.text(item.product_name, 20, y);
+      doc.text(item.quantity.toString(), 80, y);
+      doc.text(`Rs. ${item.price.toFixed(2)}`, 110, y); 
+      y += 8;
+    });
+
+    // Totals
+    y += 10;
+    doc.line(20, y - 5, 190, y - 5); 
+    doc.setFont("helvetica", "bold");
+    doc.text(`Total MRP: Rs. ${orderData.total_price}`, 20, y);
+    y += 8;
+    const discount = orderData.total_price - orderData.total_calculated_price;
+    doc.text(`Discount: Rs. ${discount}`, 20, y);
+    y += 8;
+    doc.text(`Total Calculated Price: Rs. ${orderData.total_calculated_price}`, 20, y);
+
+    doc.save(`Receipt_${orderData.order_id}.pdf`);
+  };
 
   return (
     <div className='bg-gradient-to-br from-[#d1ffc0] to-[#F0F6EE] w-[100vw] relative poppins'>
@@ -94,7 +237,7 @@ export default function AddressPage() {
               </CardDescription>
             </div>
 
-            <form onSubmit={handleSubmit} >
+            <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Address Form */}
                 <div className="lg:col-span-2">
@@ -106,7 +249,6 @@ export default function AddressPage() {
                       </CardTitle>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* Name */}
                         <div className="col-span-1 sm:col-span-2">
                           <Label htmlFor="name" className='text-stone-500 pl-1 pb-0.5'>Name*</Label>
                           <Input
@@ -119,7 +261,6 @@ export default function AddressPage() {
                           />
                         </div>
 
-                        {/* Phone */}
                         <div className="col-span-1">
                           <Label htmlFor="buyerPhone" className='text-stone-500 pl-1 pb-0.5'>Contact Number*</Label>
                           <Input
@@ -133,7 +274,6 @@ export default function AddressPage() {
                           />
                         </div>
 
-                        {/* Email (optional) */}
                         <div className="col-span-1">
                           <Label htmlFor="email" className='text-stone-500 pl-1 pb-0.5'>Email</Label>
                           <Input
@@ -146,7 +286,6 @@ export default function AddressPage() {
                           />
                         </div>
 
-                        {/* Address */}
                         <div className="col-span-1 sm:col-span-2">
                           <Label htmlFor="buyerAddress" className='text-stone-500 pl-1 pb-0.5'>Address*</Label>
                           <Textarea
@@ -159,7 +298,6 @@ export default function AddressPage() {
                           />
                         </div>
 
-                        {/* Landmark */}
                         <div className="col-span-1 sm:col-span-2">
                           <Label htmlFor="landmark" className='text-stone-500 pl-1 pb-0.5'>Landmark</Label>
                           <Input
@@ -170,19 +308,12 @@ export default function AddressPage() {
                             placeholder="Enter landmark"
                           />
                         </div>
-
-                        {/* Save Button */}
-                        <div className="col-span-1 sm:col-span-2 flex justify-end">
-                          {/* <Button type="submit" className="text-white">
-                          Save Address
-                          </Button> */}
-                        </div>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
 
-                {/* Order Summary / Extra Content */}
+                {/* Order Summary */}
                 <div className="lg:col-span-1">
                   <Card className="w-full shadow-none border-none gap-0">
                     <CardContent className='p-2'>
@@ -213,29 +344,33 @@ export default function AddressPage() {
 
                       <div className="mt-2 py-3 px-6 rounded-lg">
                         <div className="flex flex-col gap-1">
-
                           <div className="flex justify-between items-center">
-                            <span className="text-gray-600 text-sm font-medium"> MRP Before Savings</span>
+                            <span className="text-gray-600 text-sm font-medium">MRP Before Savings</span>
                             <span className="text-gray-500 text-base line-through">₹{cart.totalOriginalPrice}</span>
                           </div>
 
                           <div className="flex justify-between items-center">
-                            <span className="text-gray-600 text-sm font-medium"> You Saved </span>
+                            <span className="text-gray-600 text-sm font-medium">You Saved</span>
                             <span className="text-green-600 text-base font-semibold">- ₹{cart.totalOriginalPrice - cart.totalPrice}</span>
                           </div>
 
                           <div className="flex justify-between items-center border-t pt-2">
-                            <span className="text-base font-semibold text-gray-900"> Final Amount</span>
+                            <span className="text-base font-semibold text-gray-900">Final Amount</span>
                             <span className="text-base font-bold text-gray-900">₹{cart.totalPrice}</span>
                           </div>
-
                         </div>
                       </div>
-
                     </CardContent>
                     <CardFooter className="flex justify-end items-center">
                       <Button type='button' onClick={handlePlaceOrder} disabled={isPlacingOrder}>
-                        {isPlacingOrder ? "Placing Order..." : "Place Order"}
+                        {isPlacingOrder ? (
+                          <>
+                            <Loader2 className="animate-spin mr-2" size={16} />
+                            Placing Order...
+                          </>
+                        ) : (
+                          "Place Order"
+                        )}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -246,13 +381,15 @@ export default function AddressPage() {
         </div>
       </ScrollArea>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="flex flex-col items-center p-6 h-64 w-80 gap-2">
+      <Dialog open={isDialogOpen} onOpenChange={() => { }}>
+        <DialogContent className="flex flex-col items-center p-6 w-80 gap-4"
+          onInteractOutside={(e) => e.preventDefault()}
+        >
           <DialogHeader>
-            <DialogTitle>{isCheckmarkVisible ? "Woohoo! Your Order is Confirmed! 🎊" : "Order Confirmation"}</DialogTitle>
+            <DialogTitle>{isCheckmarkVisible ? "Order Confirmed!" : "Order Confirmation"}</DialogTitle>
             <DialogDescription>
               {isCheckmarkVisible
-                ? "We’ll notify you once it’s ready for shipping."
+                ? "We'll notify you once it's ready for shipping."
                 : "Your order is being processed."}
             </DialogDescription>
           </DialogHeader>
@@ -260,7 +397,7 @@ export default function AddressPage() {
           {isTruckAnimationDone ? (
             <CheckmarkCircle checked={isCheckmarkVisible} />
           ) : (
-            <TruckAnimation  />
+            <TruckAnimation />
           )}
 
           <p className="mt-4 text-lg font-semibold text-gray-700">
@@ -268,12 +405,16 @@ export default function AddressPage() {
           </p>
 
           <DialogFooter>
-            <DialogDescription className="text-blue-300">Redirecting to Account Page...</DialogDescription>
+            <div className='flex flex-col justify-center items-center'>
+              <DialogDescription className="text-gray-400">Redirecting to Home Page...</DialogDescription>
+              <DialogDescription className="text-gray-400">
+                <Link href="/" className='p-0 pr-2 m-0 text-blue-600 h-4'>click here...</Link>
+                if it doesn't happen.
+              </DialogDescription>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
-
   );
 }

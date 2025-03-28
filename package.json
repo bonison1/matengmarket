@@ -29,6 +29,7 @@
     "date-fns": "^3.6.0",
     "framer-motion": "^12.5.0",
     "gsap": "^3.12.7",
+    "jspdf": "^3.0.1",
     "lucide-react": "^0.479.0",
     "motion": "^12.5.0",
     "next": "^15.2.1",

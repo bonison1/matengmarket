@@ -108,7 +108,7 @@ export default function StorageWatcher() {
           prevOrderId.current = event.newValue;
           if (event.newValue && customerId && shouldUpdateCart()) {
             updateCartFromOrder(event.newValue, customerId);
-          } else if (!event.newValue || !customerId) {
+          } else if (!event.newValue && !customerId) {
             localStorage.removeItem('cart');
             dispatch(hydrateCart({ items: [], totalPrice: 0, totalOriginalPrice: 0 }));
           }
@@ -135,7 +135,7 @@ export default function StorageWatcher() {
         prevOrderId.current = orderId;
         if (orderId && customerId && shouldUpdateCart()) {
           updateCartFromOrder(orderId, customerId);
-        } else if (!orderId || !customerId) {
+        } else if (!orderId && !customerId) {
           localStorage.removeItem('cart');
           dispatch(hydrateCart({ items: [], totalPrice: 0, totalOriginalPrice: 0 }));
         }

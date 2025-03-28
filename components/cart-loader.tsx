@@ -19,7 +19,7 @@ export default function CartLoader() {
       } catch (err) {
         console.error('Failed to load cart from localStorage', err);
       }
-    } else if (orderId && customerId) {
+    } else if (orderId) {
       try {
         const response = await fetch(`/api/order/items?order_id=${orderId}`, {
           method: 'GET',

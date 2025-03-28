@@ -12,6 +12,7 @@ import { UserPen, MapPinned, PhoneCall, MailCheck } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/cart/store';
 import { Skeleton } from '@/components/ui/skeleton';
+import OrderDetails from '@/components/orderDetails/OrderDetails';
 
 export default function ProfilePage() {
     const { setTheme } = useTheme();
@@ -76,17 +77,11 @@ export default function ProfilePage() {
                             )}
                         </div>
 
+                        <Separator className="mb-2 mt-6" />
+
                         {/* Extra Details */}
                         <div className='w-full max-w-[1100px] px-2 mt-3 mx-auto gap-4 pb-10'>
-                            <div className='flex flex-col gap-2'>
-                                <span className='text-lg font-semibold text-gray-300'>Contact Info</span>
-                                <Separator className='bg-gray-600' />
-
-                                <div className='flex flex-col sm:flex-row justify-between items-center text-gray-400 text-sm'>
-                                    <p>Phone: <span className='text-gray-200'>{user?.phone || "Not Available"}</span></p>
-                                    <p>WhatsApp: <span className='text-gray-200'>{user?.whatsapp || "Not Linked"}</span></p>
-                                </div>
-                            </div>
+                            <OrderDetails/>
                         </div>
 
                     </div>

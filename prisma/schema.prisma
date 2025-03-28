@@ -284,6 +284,7 @@ model order_rec {
   landmark               String?
   buyer_id               String?      @db.Uuid
   store_ids              String[]     @db.Uuid
+  order_at               DateTime?    @db.Timestamp(6)
   order_item             order_item[]
   customers              customers?   @relation(fields: [buyer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
 }

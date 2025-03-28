@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export const GET = async (req: NextRequest, { params }: { params: { buyer_id: string } }) => {
+// Define the GET handler using query parameters
+export async function GET(req: NextRequest) {
   try {
-    const { buyer_id } = params;
+    // Extract buyer_id from query parameters
+    const { searchParams } = new URL(req.url);
+    const buyer_id = searchParams.get('buyer_id');
 
     // Validate buyer_id
-    if (!buyer_id || typeof buyer_id !== 'string') {
+    if (!buyer_id) {
       return NextResponse.json(
-        { success: false, message: 'Invalid or missing buyer_id' },
+        { success: false, message: 'buyer_id is required' },
         { status: 400 }
       );
     }
@@ -42,4 +45,4 @@ export const GET = async (req: NextRequest, { params }: { params: { buyer_id: st
       { status: 500 }
     );
   }
-};
+}

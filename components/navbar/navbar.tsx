@@ -2,21 +2,26 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { ArrowRight } from 'lucide-react'
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/lib/cart/store';
 import Image from 'next/image'
 import { Separator } from '../ui/separator';
 import { LogOut, BadgeCheck } from 'lucide-react'
 import "./navbar.css"
+import { clearCart } from '@/lib/cart/cartSlice';
+import { clearUser } from '@/lib/cart/userSlice';
+
 
 function Navbar() {
     const [isNavOpen, setNavOpen] = useState<boolean>(false);
     const navMenuRef = useRef<HTMLDivElement | null>(null);
     const pathname = usePathname();
+    const router = useRouter(); // Initialize router
+    const dispatch = useDispatch();
     const cartItems = useSelector((state: RootState) => state.cart.items);
     const user = useSelector((state: RootState) => state.user.user);
 
@@ -26,6 +31,24 @@ function Navbar() {
 
     const closedNav = () => {
         setNavOpen(false);
+    };
+
+    // Logout function
+    const handleLogout = () => {
+        // Remove items from localStorage
+        localStorage.removeItem('customer_id');
+        localStorage.removeItem('token');
+        localStorage.removeItem('order_id');
+        localStorage.removeItem('cart');
+
+        dispatch(clearCart());
+        dispatch(clearUser());
+
+        // Close the nav menu if open
+        setNavOpen(false);
+
+        // Redirect to home or login page (optional)
+        router.push('/login');
     };
 
     const links = [
@@ -52,7 +75,6 @@ function Navbar() {
         }
     }, [isNavOpen]);
 
-    // Component for user greeting button
     const UserGreeting = () => (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -73,18 +95,27 @@ function Navbar() {
                 align="end"
                 className="bg-[radial-gradient(ellipse_at_bottom,_rgba(71,81,92,1)_0%,_rgba(11,21,30,1)_45%)] text-white/70 border border-gray-400/50 shadow-lg rounded-lg p-2 min-w-[150px] z-1000"
             >
-                <DropdownMenuItem className="hover:bg-white/10 hover:text-white cursor-pointer rounded px-3 py-2">
+                <DropdownMenuItem className="hover:text-white cursor-pointer rounded px-3 py-2 mb-2"
+                    onClick={() => {
+                        router.push('/profile');
+                        setNavOpen(false);
+                    }}
+                >
                     <BadgeCheck /> Account Details
                 </DropdownMenuItem>
                 <Separator className='bg-gray-500/40' />
-                <DropdownMenuItem className="hover:bg-white/10 hover:text-white cursor-pointer rounded px-3 py-2">
+                <DropdownMenuItem className="hover:text-white cursor-pointer rounded px-3 py-2 mt-2"
+                    onClick={() => {
+                        handleLogout();
+                        setNavOpen(false);
+                    }}
+                >
                     <LogOut /> Log Out
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
 
-    // Component for login button
     const LoginButton = () => (
         <Link href={`/login?redirect=${encodeURIComponent(pathname)}`} onClick={() => setNavOpen(false)}>
             <button className="cartBtn rounded-full p-0.5 text-[0.95rem] leading-none">

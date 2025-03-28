@@ -82,7 +82,7 @@ export default function Page() {
           });
           const orderResult = await orderResponse.json();
           if (orderResult.success) {
-            orderId = orderResult.data.order_id; // Assign the new order_id
+            orderId = orderResult.data.order_id;
             localStorage.setItem('order_id', orderId);
           } else {
             throw new Error('Failed to create order');

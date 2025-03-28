@@ -2,15 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
-
-export const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
-  const { id } = params;
-
-  if (!id) {
-    return NextResponse.json({ success: false, message: 'User ID is required.' }, { status: 400 });
-  }
-
+// Define the GET handler using query parameters
+export async function GET(req: NextRequest) {
   try {
+    // Extract id from query parameters
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    // Validate id
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: 'User ID is required.' },
+        { status: 400 }
+      );
+    }
+
     const store = await prisma.users.findUnique({
       where: { user_id: id },
       select: {
@@ -57,4 +63,4 @@ export const GET = async (req: NextRequest, { params }: { params: { id: string }
       { status: 500 }
     );
   }
-};
+}

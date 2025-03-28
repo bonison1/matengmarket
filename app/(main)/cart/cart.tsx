@@ -6,14 +6,31 @@ import { RootState } from "@/lib/cart/store";
 import { addToCart, removeFromCart, decreaseQuantity } from "@/lib/cart/cartSlice";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Trash2, Minus, Plus } from "lucide-react";
+import { ShoppingCart, Trash2, Minus, Plus, CircleAlert } from "lucide-react";
 import Image from 'next/image'
 import { Label } from "@/components/ui/label";
 import Link from 'next/link';
+import { useState } from "react";
+import { useRouter, usePathname } from 'next/navigation';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const Cart: React.FC = () => {
   const dispatch = useDispatch();
   const { items, totalPrice } = useSelector((state: RootState) => state.cart);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const router = useRouter();
+  const pathname = usePathname();
 
   // Calculate Total Original Price (MRP) without discounts
   const totalOriginalPrice = items.reduce((acc, item) => {
@@ -21,6 +38,38 @@ const Cart: React.FC = () => {
   }, 0);
 
   const totalDiscount = totalOriginalPrice - totalPrice;
+
+  const handleCheckout = () => {
+    const cartData = localStorage.getItem('cart');
+    let cartItems = [];
+  
+    if (cartData) {
+      try {
+        const parsedCart = JSON.parse(cartData);
+        cartItems = parsedCart.items || []; 
+      } catch (error) {
+        console.error('Error parsing cart data:', error);
+        return; 
+      }
+    }
+  
+    if (cartItems.length === 0) {
+      toast.error('Please add products to order!', {
+        position: 'top-right',
+      });
+      setTimeout(() => {
+        router.push('/products');
+      }, 1500); 
+      return;
+    }
+  
+    const customerId = localStorage.getItem('customer_id');
+    if (customerId) {
+      router.push('/cart/address');
+    } else {
+      setIsDialogOpen(true);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-2 sm:p-6 poppins">
@@ -118,15 +167,36 @@ const Cart: React.FC = () => {
               <p>₹{totalPrice.toFixed(2)}</p>
             </div>
             <div className="w-full flex justify-center">
-              <Link href="/cart/address">
-              <Button className="mt-4 w-fit bg-gradient-to-t from-[#0752ef] to-[#437fff] text-[#FAF9F6] font-semibold ">
-                <ShoppingCart size={18} className="mr-2 ml-4" /> <span className="mr-4">Proceed to Checkout</span> 
+              <Button
+                className="mt-4 w-fit bg-gradient-to-t from-[#0752ef] to-[#437fff] text-[#FAF9F6] font-semibold"
+                onClick={handleCheckout}
+              >
+                <ShoppingCart size={18} className="mr-2 ml-4" />
+                <span className="mr-4">Proceed to Checkout</span>
               </Button>
-              </Link>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex flex-row gap-2 items-center"><CircleAlert size={18} className="text-lime-600" />Login Required!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please log in to place your order.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => router.push(`/login?redirect=${encodeURIComponent(pathname)}`)}
+            >
+              Log In
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useTheme } from "next-themes";
 import { useSearchParams } from "next/navigation";
 import { LoginForm } from "@/components/login-form";
 import { SignupForm } from "@/components/signup-form";
 
-export default function LoginPage() {
+// Separate component to use useSearchParams inside Suspense
+function LoginPageContent() {
   const { setTheme } = useTheme();
   const [isLogin, setIsLogin] = useState(true);
   const searchParams = useSearchParams();
@@ -26,5 +27,13 @@ export default function LoginPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

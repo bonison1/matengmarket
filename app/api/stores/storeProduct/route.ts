@@ -2,14 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Product, GroupedProducts } from '@/utils/types/product';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
-
-  if (!id) {
-    return NextResponse.json({ success: false, message: 'User ID missing' }, { status: 400 });
-  }
-
+// Define the GET handler using query parameters
+export async function GET(req: NextRequest) {
   try {
+    // Extract id from query parameters
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    // Validate id
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: 'User ID missing' },
+        { status: 400 }
+      );
+    }
+
     const products = await prisma.new_products.findMany({
       where: { user_id: id },
       select: {
@@ -72,12 +79,21 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       }
     });
 
-    return NextResponse.json({ success: true, data: sortedGroupedProducts }, { status: 200 });
+    return NextResponse.json(
+      { success: true, data: sortedGroupedProducts },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error('API Error fetching user products:', error);
     if (error.code === 'P1001') {
-      return NextResponse.json({ success: false, message: 'Database connection failed.' }, { status: 500 });
+      return NextResponse.json(
+        { success: false, message: 'Database connection failed.' },
+        { status: 500 }
+      );
     }
-    return NextResponse.json({ success: false, message: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message || 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

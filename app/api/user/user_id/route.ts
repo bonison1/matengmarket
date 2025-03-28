@@ -3,12 +3,20 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET(
-  request: Request,
-  { params }: { params: { user_id: string } }
-) {
+// Define the GET handler using query parameters
+export async function GET(request: Request) {
   try {
-    const userId = params.user_id;
+    // Extract user_id from query parameters
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('user_id');
+
+    // Validate user_id presence
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID is required' },
+        { status: 400 }
+      );
+    }
 
     // Validate UUID format (optional but recommended)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
