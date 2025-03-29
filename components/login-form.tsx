@@ -76,7 +76,7 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
 
         if (!existingOrderId) {
           try {
-            const orderRes = await fetch(`/api/order/buyer/${userData.customer_id}`, {
+            const orderRes = await fetch(`/api/order/buyer/getLastSaveOrder?buyer_id=${userData.customer_id}`, {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",

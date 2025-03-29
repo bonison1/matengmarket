@@ -11,16 +11,23 @@ import { Store } from '@/utils/types/store';
 import { Skeleton } from '@/components/ui/skeleton';
 import WordFlipLoader from '@/components/loader/wordFlipLoader';
 import ProductBanner from '@/components/bannerCard/productBanner';
+import { useTheme } from "next-themes";
 
 export default function Page() {
     const [stores, setStores] = useState<Store[]>([]);
     const [filteredStores, setFilteredStores] = useState<Store[]>([]);
-    const [searchTerm, setSearchTerm] = useState<string>(''); // Search term state
+    const [searchTerm, setSearchTerm] = useState<string>(''); 
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
     const [cardsPerRow, setCardsPerRow] = useState(1);
 
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+    const { setTheme } = useTheme();
+
+    useEffect(() => {
+        setTheme("light");
+    }, []);
 
     const cardWidth = 340;
     const gap = 16;
@@ -33,7 +40,7 @@ export default function Page() {
                 const data = await res.json();
                 if (data.success) {
                     setStores(data.data);
-                    setFilteredStores(data.data); // Initialize filtered
+                    setFilteredStores(data.data); 
                 } else {
                     setError('Failed to fetch stores.');
                 }

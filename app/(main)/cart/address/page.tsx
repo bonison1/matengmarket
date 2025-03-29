@@ -131,7 +131,7 @@ export default function AddressPage() {
 
       setTimeout(() => {
         setIsDialogOpen(false);
-        router.push('/');
+        router.push('/profile');
       }, 5500);
     } catch (error) {
       console.error('Error placing order:', error);

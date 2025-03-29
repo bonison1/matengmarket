@@ -131,9 +131,11 @@ function Navbar() {
     return (
         <div className='w-full absolute top-0 z-100 sm:px-4 bg-gradient-to-r from-[#131316d9] via-[#222226a6] to-[#131316d9] backdrop-blur-sm'>
             <div className='navbar flex justify-between items-center h-16'>
-                <div className="h-16 flex items-center justify-center p-2 pl-0">
-                    <img src="../logo.png" alt="logo" className="h-full object-contain" />
-                </div>
+                <Link href={`/home`}>
+                    <div className="h-16 flex items-center justify-center p-2 pl-0">
+                        <img src="../logo.png" alt="logo" className="h-full object-contain" />
+                    </div>
+                </Link>
 
                 <div className="menu-bar inline-flex gap-1 lg:gap-3 items-center ">
                     {links.map((link) => (
@@ -180,7 +182,9 @@ function Navbar() {
 
             <div className='small-navbar h-16'>
                 <div className='w-full flex justify-between items-center'>
-                    <img src="../logo.png" alt="logo" style={{ width: '9rem' }} />
+                    <Link href={`/home`}>
+                        <img src="../logo.png" alt="logo" className='ml-2' style={{ width: '9rem' }} />
+                    </Link>
 
                     <div className='flex flex-row gap-4 z-1000'>
                         <Link href="/cart" onClick={() => setNavOpen(false)}>

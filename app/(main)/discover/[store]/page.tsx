@@ -20,6 +20,7 @@ import { Search, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
 import { toast } from "sonner";
 import { Label } from '@/components/ui/label';
+import { useTheme } from "next-themes";
 
 export default function Page() {
   const { store } = useParams<{ store: string }>();
@@ -33,9 +34,13 @@ export default function Page() {
   const [searchQuery, setSearchQuery] = useState<string>('')
 
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const { setTheme } = useTheme();
 
   // Fetch store details
   useEffect(() => {
+
+    setTheme("light");
+
     if (store) {
       fetchStoreDetails(store, setStoreDetails);
       fetchProducts();
@@ -45,7 +50,7 @@ export default function Page() {
 
   const fetchStoreDetails = async (store: string, setStoreDetails: React.Dispatch<React.SetStateAction<StoreDetails | null>>) => {
     try {
-      const res = await axios.get<{ success: boolean; data: StoreDetails }>(`/api/stores/${store}`);
+      const res = await axios.get<{ success: boolean; data: StoreDetails }>(`/api/stores/id?id=${store}`);
       setStoreDetails(res.data.data);
     } catch (error) {
       console.error('Failed to fetch store details:', error);
@@ -55,7 +60,7 @@ export default function Page() {
   const fetchProducts = async () => {
     setProductLoading(true)
     try {
-      const response = await fetch(`/api/stores/storeProduct/${store}`)
+      const response = await fetch(`/api/stores/storeProduct?id=${store}`)
       const result = await response.json()
       // console.log(result)
 

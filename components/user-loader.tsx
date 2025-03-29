@@ -16,11 +16,11 @@ export default function UserLoader() {
 
     try {
       dispatch(setUserLoading());
-      const response = await fetch(`/api/user/${customerId}`, {
+      const response = await fetch(`/api/user/getUserInfo?user_id=${customerId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` }),
+          // ...(token && { Authorization: `Bearer ${token}` }),
         },
       });
 

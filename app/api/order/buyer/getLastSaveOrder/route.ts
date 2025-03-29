@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('❌ Error fetching latest order for buyer_id:', error);
+    console.error('Error fetching latest order for buyer_id:', error);
     return NextResponse.json(
       { success: false, message: 'Internal Server Error' },
       { status: 500 }
