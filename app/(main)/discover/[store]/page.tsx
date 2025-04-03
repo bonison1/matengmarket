@@ -21,6 +21,7 @@ import Image from 'next/image'
 import { toast } from "sonner";
 import { Label } from '@/components/ui/label';
 import { useTheme } from "next-themes";
+import Footer from '@/components/footer/Footer';
 
 export default function Page() {
   const { store } = useParams<{ store: string }>();
@@ -100,37 +101,37 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     const user_id = localStorage.getItem('customer_id');
     const business_user_id = storeDetails?.user_id;
-  
+
     if (!user_id) {
       toast.warning('Please log in to give feedback.');
       return;
     }
-  
+
     if (!business_user_id) {
       toast.error('Server error!.');
       return;
     }
-  
+
     if (!rating) {
       toast.warning('Please provide a rating.');
       return;
     }
-  
+
     const feedbackData = {
       business_user_id,
       user_id,
       comment: comment.trim() || null,
       rating,
     };
-  
+
     // console.log('Submitting Feedback:', feedbackData);
-  
+
     try {
       const res = await axios.post('/api/rating/store', feedbackData);
-  
+
       if (res.data.success) {
         toast.success('Thank you for your feedback! 🎉');
         setRating(0);
@@ -140,7 +141,7 @@ export default function Page() {
       }
     } catch (error: any) {
       console.error('Error submitting feedback:', error);
-  
+
       if (error.response?.status === 409) {
         toast.warning('You have already submitted feedback for this store.');
         setRating(0);
@@ -149,7 +150,7 @@ export default function Page() {
         toast.error('Something went wrong while submitting your feedback.');
       }
     }
-  };  
+  };
 
 
   if (!storeDetails) {
@@ -380,6 +381,7 @@ export default function Page() {
               </form>
             </Card>
           </div>
+          <Footer />
         </div>
       </ScrollArea>
     </div>

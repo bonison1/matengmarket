@@ -20,7 +20,7 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10); 
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newCustomer = await prisma.customers.create({
       data: {
@@ -63,13 +63,13 @@ const sendSignupEmail = async (toEmail: string, name: string) => {
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-      user: 'clintonlai.lms@gmail.com',
-      pass: 'woiw tzei pcnx duke',
+      user: 'justmateng@gmail.com',
+      pass: 'hccj sgim iiyr wlns',
     },
   });
 
   const mailOptions = {
-    from: '"testing" <clintonlai.lms@gmail.com>',
+    from: '"Justmateng" <justmateng@gmail.com>',
     to: toEmail,
     subject: 'Welcome to Mateng - Start Shopping Today!',
     html: `
@@ -80,6 +80,9 @@ const sendSignupEmail = async (toEmail: string, name: string) => {
       <p>We're excited to have you join our mateng community. Explore a wide range of products, place orders easily, and enjoy a seamless shopping experience.</p>
 
       <p>Happy Shopping!</p>
+
+     <br/>
+      <a href="https://justmateng.com">Visit Justmateng</a>
 
       <p>Best regards,<br/>
       The Mateng Team</p>

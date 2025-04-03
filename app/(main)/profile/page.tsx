@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/cart/store';
 import { Skeleton } from '@/components/ui/skeleton';
 import OrderDetails from '@/components/orderDetails/OrderDetails';
+import Footer from '@/components/footer/Footer';
 
 export default function ProfilePage() {
     const { setTheme } = useTheme();
@@ -68,11 +69,11 @@ export default function ProfilePage() {
                                     <span className='flex flex-row gap-1 items-center'><MailCheck size={15} /> {user?.email || "No Email Available"}</span>
                                 </CardDescription>
                             )}
-                             {loading ? (
+                            {loading ? (
                                 <Skeleton className="w-1/3 h-5 mt-2 rounded-lg" />
                             ) : (
                                 <CardDescription className='text-gray-400 text-sm flex flex-row gap-1 items-center'>
-                                   <MapPinned size={15} /> {user?.address || "n/a"}
+                                    <MapPinned size={15} /> {user?.address || "n/a"}
                                 </CardDescription>
                             )}
                         </div>
@@ -81,10 +82,10 @@ export default function ProfilePage() {
 
                         {/* Extra Details */}
                         <div className='w-full max-w-[1100px] px-2 mt-3 mx-auto gap-4 pb-10'>
-                            <OrderDetails/>
+                            <OrderDetails />
                         </div>
-
                     </div>
+                    <Footer />
                 </div>
             </ScrollArea>
         </div>

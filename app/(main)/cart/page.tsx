@@ -4,13 +4,14 @@ import React, { useEffect } from 'react'
 import Cart from './cart';
 import { useTheme } from "next-themes"
 import { ScrollArea } from '@/components/ui/scroll-area';
+import Footer from '@/components/footer/Footer';
 
 // Define the shape of a cart item
 interface CartItem {
   id: number;
   name: string;
   quantity: number;
-  price_inr?: number; 
+  price_inr?: number;
   discounted_price?: number;
   media_urls?: string[];
   unit_quantity?: string | null;
@@ -123,11 +124,14 @@ export default function Page() {
   return (
     <div className='bg-[#efeee7] w-[100vw] relative'>
       <ScrollArea>
-        <div className='w-[100vw] h-[100svh]'>
-          <div className='w-full h-16 bg-stone-600'></div>
-          <div className='w-full max-w-[1400px] mx-auto p-4 relative'>
-            <Cart />
+        <div className='w-[100vw] h-[100svh] flex flex-col justify-between'>
+          <div>
+            <div className='w-full h-16 bg-stone-600'></div>
+            <div className='w-full max-w-[1400px] mx-auto p-4 relative'>
+              <Cart />
+            </div>
           </div>
+          <Footer />
         </div>
       </ScrollArea>
     </div>
