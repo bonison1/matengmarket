@@ -29,6 +29,7 @@
     "date-fns": "^3.6.0",
     "framer-motion": "^12.6.3",
     "gsap": "^3.12.7",
+    "input-otp": "^1.4.2",
     "jspdf": "^3.0.1",
     "lodash": "^4.17.21",
     "lucide-react": "^0.479.0",

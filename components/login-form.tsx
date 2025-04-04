@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux"; 
-import { AppDispatch } from "@/lib/cart/store"; 
-import { setUser } from "@/lib/cart/userSlice"; 
-import { GalleryVerticalEnd, BellRing } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/lib/cart/store";
+import { setUser } from "@/lib/cart/userSlice";
+import { GalleryVerticalEnd, BellRing, Loader2 } from "lucide-react"; // Added Loader2 for spinner
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "./ui/card";
 import { toast } from "sonner";
-import DatePicker from "@/components/ui/date-picker";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +19,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
+  DialogClose, // Added for explicit close button
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -30,7 +30,12 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { format } from "date-fns";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 interface LoginFormProps {
   className?: string;
@@ -43,11 +48,13 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>(); 
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [dob, setDob] = useState<Date | null>(null);
-  const [newPassword, setNewPassword] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
   const [forgotDialogOpen, setForgotDialogOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [isRequestingOtp, setIsRequestingOtp] = useState(false); // New state for loading
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,29 +70,20 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
       const data = await res.json();
 
       if (res.ok) {
-        const userData = data.data; 
-        
-        // Save to localStorage
+        const userData = data.data;
         localStorage.setItem("customer_id", userData.customer_id);
         localStorage.setItem("token", userData.token);
-
-        // Save to Redux store
         dispatch(setUser(userData));
 
         const existingOrderId = localStorage.getItem("order_id");
-
         if (!existingOrderId) {
           try {
             const orderRes = await fetch(`/api/order/buyer/getLastSaveOrder?buyer_id=${userData.customer_id}`, {
               method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                // "Authorization": `Bearer ${userData.token}`,
-              },
+              headers: { "Content-Type": "application/json" },
             });
 
             const orderData = await orderRes.json();
-
             if (orderRes.ok && orderData.success && orderData.data?.order_id) {
               localStorage.setItem("order_id", orderData.data.order_id);
             }
@@ -97,41 +95,77 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
         toast.success(`Welcome back, ${userData.name}!`, { position: "top-right" });
         router.push(redirect || "/home");
       } else {
-        toast.error(data.message || "Login failed");
+        toast.error(data.message || "Login failed", { position: "top-right" });
       }
     } catch (err: any) {
-      toast.error("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.", { position: "top-right" });
     }
   };
 
-  const handleForgotPassword = async () => {
-    const dobFormatted = dob ? format(dob, 'yyyy-MM-dd') : null;
+  const handleRequestOtp = async () => {
+    if (!emailOrPhone) {
+      toast.error("Please enter email", { position: "top-right" });
+      return;
+    }
+
+    setIsRequestingOtp(true); // Start loading state
 
     try {
       const res = await fetch('/api/forgotPassword', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emailOrPhone, dob: dobFormatted, newPassword }),
+        body: JSON.stringify({ email: emailOrPhone }),
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        toast.error("Failed to change password");
+      if (res.ok) {
+        setIsOtpSent(true);
+        toast.success(data.message, { position: "top-right" });
       } else {
-        toast.success("Password changed successfully");
-        setForgotDialogOpen(false);
-        resetFields();
+        toast.error(data.message, { position: "top-right" });
       }
     } catch (err: any) {
-      toast.error("Something went wrong");
+      toast.error("Something went wrong", { position: "top-right" });
+    } finally {
+      setIsRequestingOtp(false); // End loading state
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!newPassword) {
+      toast.error("Please enter new password", { position: "top-right" });
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/forgotPassword', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailOrPhone, otp, newPassword }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(data.message, { position: "top-right" });
+        setForgotDialogOpen(false);
+        resetFields();
+      } else {
+        toast.error(data.message, { position: "top-right" });
+      }
+    } catch (err: any) {
+      toast.error("Something went wrong", { position: "top-right" });
     }
   };
 
   const resetFields = () => {
     setEmailOrPhone("");
-    setDob(null);
     setNewPassword("");
+    setOtp("");
+    setIsOtpSent(false);
+    setConfirmDialogOpen(false);
+    setIsRequestingOtp(false);
   };
 
   return (
@@ -146,7 +180,7 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
             </a>
             <h1 className="text-xl font-bold">Welcome to Mateng</h1>
             <div className="text-center text-sm">
-              Don&apos;t have an account?{" "}
+              Don't have an account?{" "}
               <button type="button" onClick={() => setIsLogin(false)} className="underline underline-offset-4 text-blue-500">
                 Sign up
               </button>
@@ -200,48 +234,85 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
       {/* Forgot Password Dialog */}
       <Dialog
         open={forgotDialogOpen}
-        onOpenChange={(open) => {
-          setForgotDialogOpen(open);
-          if (!open) {
-            resetFields(); 
-            setConfirmDialogOpen(false); 
-          }
-        }}
+        onOpenChange={(open) => setForgotDialogOpen(open)} // Controlled by state only
       >
-        <DialogContent className="w-[90%] sm:w-full -translate-y-54">
+        <DialogContent 
+          className="w-[90%] sm:w-full"
+          onInteractOutside={(e) => e.preventDefault()} // Prevent closing on outside click
+          onEscapeKeyDown={(e) => e.preventDefault()} // Prevent closing with Escape key
+        >
           <DialogHeader className="text-left pb-2 mb-1 border-b">
             <DialogTitle>Reset Password</DialogTitle>
-            <DialogDescription>#Please filled the details correctly to reset the password!</DialogDescription>
+            <DialogDescription>
+              {isOtpSent
+                ? "Enter the OTP sent to your email and your new password"
+                : "Enter your email to receive an OTP"}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4">
             <div>
-              <Label className="mb-3">Email or Phone</Label>
+              <Label className="mb-3">Email</Label>
               <Input
                 value={emailOrPhone}
                 onChange={(e) => setEmailOrPhone(e.target.value)}
-                placeholder="Enter email or phone"
+                placeholder="Enter email"
+                disabled={isOtpSent}
               />
             </div>
 
-            <div>
-              <Label className="mb-3">Date of Birth</Label>
-              <DatePicker selected={dob} onChange={setDob} />
-            </div>
-
-            <div>
-              <Label className="mb-3">Enter New Password</Label>
-              <Input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password"
-              />
-            </div>
+            {isOtpSent && (
+              <>
+                <div>
+                  <Label className="mb-3">Enter OTP</Label>
+                  <InputOTP maxLength={6} value={otp} onChange={(value) => setOtp(value)}>
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                    </InputOTPGroup>
+                    <InputOTPSeparator />
+                    <InputOTPGroup>
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+                <div>
+                  <Label className="mb-3">New Password</Label>
+                  <Input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                  />
+                </div>
+              </>
+            )}
           </div>
 
-          <DialogFooter>
-            <Button className="text-white mt-2" onClick={() => setConfirmDialogOpen(true)}>Change Password</Button>
+          <DialogFooter className="flex justify-between items-center">
+            {!isOtpSent ? (
+              <Button 
+                className="text-white mt-2" 
+                onClick={handleRequestOtp}
+                disabled={isRequestingOtp}
+              >
+                {isRequestingOtp ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Requesting...
+                  </>
+                ) : (
+                  "Request OTP"
+                )}
+              </Button>
+            ) : (
+              <Button className="text-white mt-2" onClick={() => setConfirmDialogOpen(true)}>
+                Verify OTP & Reset
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -250,18 +321,21 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
       <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex gap-2 items-start text-left"><BellRing className="w-5 text-green-500" />Are you sure you want to change the password?</AlertDialogTitle>
+            <AlertDialogTitle className="flex gap-2 items-start text-left">
+              <BellRing className="w-5 text-green-500" />
+              Are you sure you want to reset your password?
+            </AlertDialogTitle>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row justify-end gap-4" >
+          <AlertDialogFooter className="flex flex-row justify-end gap-4">
             <AlertDialogCancel className="w-fit">Cancel</AlertDialogCancel>
             <AlertDialogAction
-            className="text-white w-fit"
+              className="text-white w-fit"
               onClick={() => {
-                handleForgotPassword();
+                handleResetPassword();
                 setConfirmDialogOpen(false);
               }}
             >
-              Yes, Change
+              Yes, Reset
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

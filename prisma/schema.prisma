@@ -45,22 +45,24 @@ model commission_payout {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model customers {
-  customer_id                    String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name                           String      @db.VarChar(255)
-  email                          String      @unique(map: "customer_email_key")
+  customer_id                    String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name                           String            @db.VarChar(255)
+  email                          String            @unique(map: "customer_email_key")
   password                       String
-  address                        String?     @db.VarChar(255)
-  phone                          String?     @db.VarChar(20)
-  profile_pic                    String?     @default("")
-  whatsapp                       String?     @db.VarChar
-  remarks                        String?     @db.VarChar
-  order_record                   Json?       @db.Json
-  created_at                     DateTime?   @db.Timestamp(6)
-  updated_at                     DateTime?   @db.Timestamp(6)
-  token                          String      @unique @db.VarChar
-  dob                            DateTime?   @db.Date
+  address                        String?           @db.VarChar(255)
+  phone                          String?           @db.VarChar(20)
+  profile_pic                    String?           @default("")
+  whatsapp                       String?           @db.VarChar
+  remarks                        String?           @db.VarChar
+  order_record                   Json?             @db.Json
+  created_at                     DateTime?         @db.Timestamp(6)
+  updated_at                     DateTime?         @db.Timestamp(6)
+  token                          String            @unique @db.VarChar
+  dob                            DateTime?         @db.Date
+  delivery_orders                delivery_orders[]
   order_rec                      order_rec[]
-  ratings_ratings_user_idTousers ratings[]   @relation("ratings_user_idTousers")
+  ratings_ratings_user_idTousers ratings[]         @relation("ratings_user_idTousers")
+  servicesBook                   servicesBook[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -83,32 +85,26 @@ model deliveries {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model delivery_orders {
-  id              Int       @id @default(autoincrement())
-  pickup_name     String    @db.VarChar(100)
-  pickup_phone    String    @db.VarChar(15)
+  id              Int        @id @default(autoincrement())
+  pickup_name     String
+  pickup_phone    String
   pickup_address  String
-  dropoff_name    String    @db.VarChar(100)
-  dropoff_phone   String    @db.VarChar(15)
+  dropoff_name    String
+  dropoff_phone   String
   dropoff_address String
   instructions    Json
-  distance        Decimal?  @db.Decimal(10, 2)
-  charge          Decimal?  @db.Decimal(10, 2)
-  created_at      DateTime? @default(now()) @db.Timestamp(6)
-}
-
-model distance_calculations {
-  id                Int       @id @default(autoincrement())
-  pickup_details    String
-  drop_details      String
-  origin            String
-  destination       String
-  distance          String
-  delivery_charge   String
-  created_at        DateTime? @default(now()) @db.Timestamptz(6)
-  status            String    @default("Pending")
-  status_updated_at DateTime? @default(now()) @db.Timestamptz(6)
-
-  @@unique([origin, destination], map: "idx_unique_calculation")
+  distance        Decimal?   @db.Decimal(10, 2)
+  charge          Decimal?   @db.Decimal(10, 2)
+  created_at      DateTime?  @default(now()) @db.Timestamp(6)
+  pickup_cord     String?
+  dropoff_cord    String?
+  status          String?    @default("'Pending'::text")
+  updated_at      DateTime?  @db.Timestamp(6)
+  customer_id     String?    @db.Uuid
+  isBusiness      Int?       @db.SmallInt
+  business_id     String?    @db.Uuid
+  users           users?     @relation(fields: [business_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  customers       customers? @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -119,23 +115,6 @@ model employees {
   password   String?      @db.VarChar
   role       String?      @db.VarChar
   order_data order_data[]
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model item_datas {
-  id                  Int       @id @default(autoincrement())
-  name                String    @db.VarChar(255)
-  mrp                 Decimal   @db.Decimal(10, 2)
-  discount            Decimal?  @default(0) @db.Decimal(10, 2)
-  tax                 Decimal?  @default(0) @db.Decimal(10, 2)
-  rate_after_discount Decimal?  @default(dbgenerated("(mrp - discount)")) @db.Decimal(10, 2)
-  created_at          DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at          DateTime? @default(now()) @db.Timestamptz(6)
-  user_id             String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  qty                 Decimal?  @db.Decimal
-  users               users?    @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_id")
-
-  @@index([name], map: "idx_item_name")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -200,20 +179,6 @@ model new_products {
   updated_at       DateTime?    @db.Timestamp(6)
   users            users?       @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
   order_item       order_item[]
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model objects {
-  id              Int     @id
-  name            String  @db.VarChar(255)
-  email           String  @db.VarChar(255)
-  address         String
-  current_address String?
-  phone           String  @db.VarChar(20)
-  position        String  @db.VarChar(50)
-  resume_url      String?
-  additional_data Json?
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -335,14 +300,6 @@ model sales {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model sent_emails {
-  id      Int       @id @default(autoincrement())
-  email   String
-  sent_at DateTime? @default(now()) @db.Timestamptz(6)
-  status  String?   @default("sent")
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model team_users {
   id         Int       @id @default(autoincrement())
   username   String?   @db.VarChar(100)
@@ -406,36 +363,60 @@ model user_messages {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model users {
-  user_id                                            String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name                                               String          @db.VarChar(255)
-  email                                              String          @unique
+  user_id                                            String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name                                               String            @db.VarChar(255)
+  email                                              String            @unique
   password                                           String
-  address                                            String?         @db.VarChar(255)
-  phone                                              String?         @db.VarChar(20)
-  is_business_owner                                  Boolean?        @default(false)
-  business_name                                      String?         @db.VarChar(255)
-  business_address                                   String?         @db.VarChar(255)
-  business_type                                      String?         @db.VarChar(100)
-  product_service                                    String?         @db.VarChar(255)
+  address                                            String?           @db.VarChar(255)
+  phone                                              String?           @db.VarChar(20)
+  is_business_owner                                  Boolean?          @default(false)
+  business_name                                      String?           @db.VarChar(255)
+  business_address                                   String?           @db.VarChar(255)
+  business_type                                      String?           @db.VarChar(100)
+  product_service                                    String?           @db.VarChar(255)
   business_experience                                String?
   business_description                               String?
-  is_registered                                      Boolean?        @default(false)
-  isbusinessowner                                    Boolean?        @default(false)
-  photo                                              String?         @default("")
+  is_registered                                      Boolean?          @default(false)
+  isbusinessowner                                    Boolean?          @default(false)
+  photo                                              String?           @default("")
   categories                                         String[]
-  ratings                                            Decimal?        @default(0) @db.Decimal(3, 2)
+  ratings                                            Decimal?          @default(0) @db.Decimal(3, 2)
   whatsapp                                           String?
-  item_datas                                         item_datas[]
-  messages_messages_receiver_idTousers               messages[]      @relation("messages_receiver_idTousers")
-  messages_messages_sender_idTousers                 messages[]      @relation("messages_sender_idTousers")
+  delivery_orders                                    delivery_orders[]
+  messages_messages_receiver_idTousers               messages[]        @relation("messages_receiver_idTousers")
+  messages_messages_sender_idTousers                 messages[]        @relation("messages_sender_idTousers")
   new_products                                       new_products[]
   order_data                                         order_data[]
   products                                           products[]
-  ratings_ratings_business_user_idTousers            ratings[]       @relation("ratings_business_user_idTousers")
-  sales_sales_usersTousers                           sales[]         @relation("sales_usersTousers")
-  user_contacts_user_contacts_contact_user_idTousers user_contacts[] @relation("user_contacts_contact_user_idTousers")
-  user_contacts_user_contacts_link1Tousers           user_contacts[] @relation("user_contacts_link1Tousers")
-  user_contacts_user_contacts_user_idTousers         user_contacts[] @relation("user_contacts_user_idTousers")
+  ratings_ratings_business_user_idTousers            ratings[]         @relation("ratings_business_user_idTousers")
+  sales_sales_usersTousers                           sales[]           @relation("sales_usersTousers")
+  servicesBook                                       servicesBook[]
+  user_contacts_user_contacts_contact_user_idTousers user_contacts[]   @relation("user_contacts_contact_user_idTousers")
+  user_contacts_user_contacts_link1Tousers           user_contacts[]   @relation("user_contacts_link1Tousers")
+  user_contacts_user_contacts_user_idTousers         user_contacts[]   @relation("user_contacts_user_idTousers")
   user_links                                         user_links?
   user_messages                                      user_messages[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model servicesBook {
+  id                Int        @id(map: "distance_calculations_pkey") @default(autoincrement())
+  pickup_details    String
+  drop_details      String
+  origin            String
+  destination       String
+  distance          String
+  delivery_charge   String
+  created_at        DateTime?  @default(now()) @db.Timestamptz(6)
+  status            String     @default("Pending")
+  status_updated_at DateTime?  @default(now()) @db.Timestamptz(6)
+  origin_cord       String?
+  destination_cord  String?
+  customer_id       String?    @db.Uuid
+  user_id           String?    @db.Uuid
+  isBusiness        Int?       @db.SmallInt
+  customers         customers? @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+  users             users?     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([origin, destination], map: "idx_unique_calculation")
 }

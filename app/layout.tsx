@@ -36,7 +36,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
       >
@@ -47,16 +46,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <MapProvider>
-            <div className="w-[100vw] h-[100svh] custom-bg relative">
-              <div className="lines">
-                <div className="line"></div>
-                <div className="line"></div>
-                <div className="line"></div>
-                <div className="line"></div>
-              </div>
-              <div className="bg-overlay"></div>
-              {children}
-            </div>
+            {children}
           </MapProvider>
         </ThemeProvider>
         <Toaster />

@@ -24,7 +24,6 @@
   background-color: #09090b40;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-
   transform: translateX(-20%) scaleX(0.8);
   opacity: 0;
   transition: transform 0.3s ease-out, opacity 0.3s ease;
@@ -51,7 +50,6 @@
   color: rgb(218, 218, 218);
   border: none;
   font-weight: 600;
-  cursor: pointer;
   position: relative;
   overflow: visible;
 }
@@ -62,9 +60,6 @@
   justify-content: center;
   text-shadow: 0px 0px 20px #4b4b4b;
   width: 100%;
-  display: flex;
-  align-items: center;
-  /* gap: 12px; */
   color: inherit;
   transition: all 0.3s;
   background-color: #1d1d20;
@@ -123,7 +118,6 @@
     transform: translateY(-30px);
     opacity: 1;
   }
-
   100% {
     transform: translateY(0) rotate(-90deg);
     opacity: 1;
@@ -139,21 +133,13 @@
     transform: translateX(-10px);
     opacity: 0;
   }
-
   100% {
     transform: translateX(0);
     opacity: 1;
   }
 }
 
-
-
-
-
-
-
 .small-navbar {
-  background-color: none;
   width: 100%;
   z-index: 1000;
   position: relative;
@@ -169,20 +155,23 @@
   align-items: center;
   justify-content: center;
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, height 0s linear 0.3s;
+  will-change: opacity, height;
 }
 
 .nav-menu.open {
   display: flex;
   opacity: 1;
-  visibility: visible;
+  height: auto;
+  transition: opacity 0.3s ease;
 }
 
 .nav-menu.closed {
-  transition: opacity 0.6s ease, visibility 0.6s ease;
   opacity: 0;
-  visibility: hidden;
+  height: 0;
+  transition: opacity 0.3s ease, height 0s linear 0.3s;
 }
 
 .small-navbar nav {
@@ -208,14 +197,16 @@
   font-family: "Geologica", sans-serif;
   margin: 10px 0;
   color: #fdfdfd;
-  opacity: 0;
   text-decoration: none;
   transform: translateY(-20px);
+  opacity: 0;
   width: fit-content;
+  position: relative;
+  will-change: transform, opacity;
 }
 
 .navlink.animate {
-  animation: fadeDown 1.2s forwards;
+  animation: fadeDown 0.6s ease-out forwards;
 }
 
 .navlink::after {
@@ -226,7 +217,7 @@
   width: 0;
   height: 3px;
   background-color: #e7e7e7;
-  cursor: pointer;
+  transition: width 0.3s ease;
 }
 
 .navlink.active::after {
@@ -234,19 +225,19 @@
 }
 
 .navlink.animate:nth-child(1) {
-  animation-delay: 0;
+  animation-delay: 0s;
 }
 
 .navlink.animate:nth-child(2) {
-  animation-delay: 0.3s;
+  animation-delay: 0.1s;
 }
 
 .navlink.animate:nth-child(3) {
-  animation-delay: 0.5s;
+  animation-delay: 0.2s;
 }
 
 .navlink.animate:nth-child(4) {
-  animation-delay: 0.7s;
+  animation-delay: 0.3s;
 }
 
 @keyframes fadeDown {
@@ -272,7 +263,7 @@
 
 .hamburger svg {
   height: 3em;
-  transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .line {
@@ -281,8 +272,8 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2.5;
-  transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
-    stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: stroke-dasharray 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .line-top-bottom {
@@ -298,7 +289,6 @@
   stroke-dashoffset: -32.42;
 }
 
-
 @media (max-width: 960px) {
   .navbar {
     display: none;
@@ -307,5 +297,4 @@
   .small-navbar {
     display: flex;
   }
-
 }
