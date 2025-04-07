@@ -6,7 +6,7 @@ export interface Store {
     business_experience: string;
     photo?: string;
     categories: string[];
-    ratings: number;
+    rating: number;
     whatsapp: string;
   }
   

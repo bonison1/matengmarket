@@ -1,12 +1,12 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
-  emitSources     = "false"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["public"]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -21,6 +21,8 @@ model businesses {
   description      String?
   created_at       DateTime? @default(now()) @db.Timestamp(6)
   notificationtype String?   @default("email") @db.VarChar(50)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -30,6 +32,8 @@ model cid_billing {
   submitted_amount Decimal   @db.Decimal
   team_id          String
   created_at       DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("public")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -40,29 +44,32 @@ model commission_payout {
   payout_amount Decimal   @db.Decimal
   team_id       String
   created_at    DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("public")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model customers {
-  customer_id                    String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name                           String            @db.VarChar(255)
-  email                          String            @unique(map: "customer_email_key")
-  password                       String
-  address                        String?           @db.VarChar(255)
-  phone                          String?           @db.VarChar(20)
-  profile_pic                    String?           @default("")
-  whatsapp                       String?           @db.VarChar
-  remarks                        String?           @db.VarChar
-  order_record                   Json?             @db.Json
-  created_at                     DateTime?         @db.Timestamp(6)
-  updated_at                     DateTime?         @db.Timestamp(6)
-  token                          String            @unique @db.VarChar
-  dob                            DateTime?         @db.Date
-  delivery_orders                delivery_orders[]
-  order_rec                      order_rec[]
-  ratings_ratings_user_idTousers ratings[]         @relation("ratings_user_idTousers")
-  servicesBook                   servicesBook[]
+  customer_id     String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String            @db.VarChar(255)
+  email           String            @unique(map: "customer_email_key")
+  password        String
+  address         String?           @db.VarChar(255)
+  phone           String?           @db.VarChar(20)
+  profile_pic     String?           @default("")
+  whatsapp        String?           @db.VarChar
+  remarks         String?           @db.VarChar
+  order_record    Json?             @db.Json
+  created_at      DateTime?         @db.Timestamp(6)
+  updated_at      DateTime?         @db.Timestamp(6)
+  token           String            @unique @db.VarChar
+  dob             DateTime?         @db.Date
+  delivery_orders delivery_orders[]
+  order_rec       order_rec[]
+  ratings         ratings[]
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -81,6 +88,8 @@ model deliveries {
   created_at      DateTime? @default(now()) @db.Timestamp(6)
   order_id        String?   @unique
   status          String?   @default("pending")
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -105,6 +114,8 @@ model delivery_orders {
   business_id     String?    @db.Uuid
   users           users?     @relation(fields: [business_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
   customers       customers? @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -115,6 +126,8 @@ model employees {
   password   String?      @db.VarChar
   role       String?      @db.VarChar
   order_data order_data[]
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -130,6 +143,8 @@ model job_openings {
   additional_data Json?
   created_at      DateTime? @default(now()) @db.Timestamp(6)
   updated_at      DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -146,6 +161,8 @@ model message_data {
   status        String?   @default("Pending") @db.VarChar
   sent_at       DateTime? @db.Timestamptz(6)
   sender_email  String?
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -159,6 +176,8 @@ model messages {
   timestamp                         DateTime? @default(now()) @db.Timestamp(6)
   users_messages_receiver_idTousers users?    @relation("messages_receiver_idTousers", fields: [receiver_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
   users_messages_sender_idTousers   users?    @relation("messages_sender_idTousers", fields: [sender_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -179,6 +198,8 @@ model new_products {
   updated_at       DateTime?    @db.Timestamp(6)
   users            users?       @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
   order_item       order_item[]
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -215,6 +236,8 @@ model order_data {
   inv            String?
   employees      employees? @relation(fields: [employee_id], references: [id], onUpdate: NoAction)
   users          users?     @relation(fields: [vendor_email], references: [email], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -229,6 +252,7 @@ model order_item {
   new_products new_products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([order_id, product_id], name: "unique_id", map: "unique_id")
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -252,6 +276,8 @@ model order_rec {
   order_at               DateTime?    @db.Timestamp(6)
   order_item             order_item[]
   customers              customers?   @relation(fields: [buyer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -268,19 +294,23 @@ model products {
   whatsapp    String?   @db.VarChar(25)
   price_inr   Decimal   @default(0.00) @db.Decimal(10, 2)
   users       users?    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+
+  @@schema("public")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model ratings {
-  id                                    Int        @id @default(autoincrement())
-  user_id                               String?    @db.Uuid
-  business_user_id                      String?    @db.Uuid
-  rating                                Int
-  created_at                            DateTime?  @default(now()) @db.Timestamptz(6)
-  comment                               String?
-  users_ratings_business_user_idTousers users?     @relation("ratings_business_user_idTousers", fields: [business_user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
-  users_ratings_user_idTousers          customers? @relation("ratings_user_idTousers", fields: [user_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+  id               Int        @id @default(autoincrement())
+  user_id          String?    @db.Uuid
+  business_user_id String?    @db.Uuid
+  rating           Int
+  created_at       DateTime?  @default(now()) @db.Timestamptz(6)
+  comment          String?
+  users            users?     @relation(fields: [business_user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  customers        customers? @relation(fields: [user_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -297,6 +327,30 @@ model sales {
   invoice_number           String?
   sale_date                DateTime? @db.Date
   users_sales_usersTousers users?    @relation("sales_usersTousers", fields: [users], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model servicesBook {
+  id                Int       @id(map: "distance_calculations_pkey") @default(autoincrement())
+  pickup_details    String
+  drop_details      String
+  origin            String
+  destination       String
+  distance          String
+  delivery_charge   String
+  created_at        DateTime? @default(now()) @db.Timestamptz(6)
+  status            String    @default("Pending")
+  status_updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  origin_cord       String?
+  destination_cord  String?
+  customer_id       String?   @db.Uuid
+  user_id           String?   @db.Uuid
+  isBusiness        Int?      @db.SmallInt
+
+  @@unique([origin, destination], map: "idx_unique_calculation")
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -307,6 +361,8 @@ model team_users {
   team_code  String?   @db.VarChar(50)
   password   String?   @db.VarChar(255)
   created_at DateTime? @default(now()) @db.Timestamp(6)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -316,6 +372,8 @@ model teams {
   password   String    @db.VarChar(255)
   created_at DateTime? @default(now()) @db.Timestamp(6)
   owner_id   Decimal?  @db.Decimal
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -327,6 +385,8 @@ model user_contacts {
   users_user_contacts_contact_user_idTousers users?  @relation("user_contacts_contact_user_idTousers", fields: [contact_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
   users_user_contacts_link1Tousers           users?  @relation("user_contacts_link1Tousers", fields: [link1], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
   users_user_contacts_user_idTousers         users?  @relation("user_contacts_user_idTousers", fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -337,6 +397,8 @@ model user_data {
   email   String? @db.VarChar
   to      String? @db.VarChar
   from    String? @db.VarChar
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -346,6 +408,8 @@ model user_links {
   link2   String?
   link3   String?
   users   users   @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -358,6 +422,8 @@ model user_messages {
   receiver_id     String?   @db.Uuid
   created_at      DateTime? @default(now()) @db.Timestamp(6)
   users           users?    @relation(fields: [receiver_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -380,7 +446,7 @@ model users {
   isbusinessowner                                    Boolean?          @default(false)
   photo                                              String?           @default("")
   categories                                         String[]
-  ratings                                            Decimal?          @default(0) @db.Decimal(3, 2)
+  rating                                             Decimal?          @default(0) @db.Decimal(3, 2)
   whatsapp                                           String?
   delivery_orders                                    delivery_orders[]
   messages_messages_receiver_idTousers               messages[]        @relation("messages_receiver_idTousers")
@@ -388,35 +454,13 @@ model users {
   new_products                                       new_products[]
   order_data                                         order_data[]
   products                                           products[]
-  ratings_ratings_business_user_idTousers            ratings[]         @relation("ratings_business_user_idTousers")
+  ratings                                            ratings[]
   sales_sales_usersTousers                           sales[]           @relation("sales_usersTousers")
-  servicesBook                                       servicesBook[]
   user_contacts_user_contacts_contact_user_idTousers user_contacts[]   @relation("user_contacts_contact_user_idTousers")
   user_contacts_user_contacts_link1Tousers           user_contacts[]   @relation("user_contacts_link1Tousers")
   user_contacts_user_contacts_user_idTousers         user_contacts[]   @relation("user_contacts_user_idTousers")
   user_links                                         user_links?
   user_messages                                      user_messages[]
-}
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model servicesBook {
-  id                Int        @id(map: "distance_calculations_pkey") @default(autoincrement())
-  pickup_details    String
-  drop_details      String
-  origin            String
-  destination       String
-  distance          String
-  delivery_charge   String
-  created_at        DateTime?  @default(now()) @db.Timestamptz(6)
-  status            String     @default("Pending")
-  status_updated_at DateTime?  @default(now()) @db.Timestamptz(6)
-  origin_cord       String?
-  destination_cord  String?
-  customer_id       String?    @db.Uuid
-  user_id           String?    @db.Uuid
-  isBusiness        Int?       @db.SmallInt
-  customers         customers? @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction)
-  users             users?     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@unique([origin, destination], map: "idx_unique_calculation")
+  @@schema("public")
 }

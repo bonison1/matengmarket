@@ -45,9 +45,18 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+           <div className="w-[100vw] custom-bg relative">
+          <div className="lines">
+            <div className="line"></div>
+            <div className="line"></div>
+            <div className="line"></div>
+            <div className="line"></div>
+          </div>
+          <div className="bg-overlay"></div>
           <MapProvider>
             {children}
           </MapProvider>
+          </div>
         </ThemeProvider>
         <Toaster />
       </body>

@@ -14,7 +14,7 @@ export interface StoreDetails {
     is_registered: boolean;
     photo: string;
     categories: string[];      // If this is an array, change to: string[]
-    ratings: number | null;  // Adjust based on your schema
+    rating: number;  // Adjust based on your schema
     whatsapp: string;
   }
   

@@ -54,8 +54,7 @@ export function LoginForm({ className, setIsLogin, redirect, ...props }: LoginFo
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [isRequestingOtp, setIsRequestingOtp] = useState(false); // New state for loading
-
+  const [isRequestingOtp, setIsRequestingOtp] = useState(false); 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");

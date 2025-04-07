@@ -15,7 +15,7 @@ interface StoreCardProps {
         business_experience: string;
         photo?: string;
         categories: string[];
-        ratings: number;
+        rating: number;
         whatsapp: string;
     };
 }
@@ -74,7 +74,7 @@ export default function StoreCard({ store }: StoreCardProps) {
                         <div className='w-full h-12 flex justify-between items-center p-2 pt-1'>
                             <div className='flex flex-col leading-none'>
                                 <span className='text-sm font-medium text-[#9D9898CC] pl-1 translate-y-0.5 hover:text-[#9D9898]'>Rating</span>
-                                <Rating rating={store.ratings} editable={false} size={starSize} />
+                                <Rating rating={store.rating} editable={false} size={starSize} />
                             </div>
                             <div className='relative'>
                                 <button

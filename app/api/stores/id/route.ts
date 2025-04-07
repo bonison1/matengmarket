@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
         is_registered: true,
         photo: true,
         categories: true,
-        ratings: true,
+        rating: true,
         whatsapp: true,
       },
     });

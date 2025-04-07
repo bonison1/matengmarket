@@ -19,9 +19,6 @@ import { toast } from "sonner";
 import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { hydrateCart } from '@/lib/cart/cartSlice';
-import { jsPDF } from 'jspdf'; 
-import { format } from 'date-fns';
-
 
 export default function AddressPage() {
   const { setTheme } = useTheme();
@@ -115,11 +112,6 @@ export default function AddressPage() {
       setIsTruckAnimationDone(false);
       setIsCheckmarkVisible(false);
 
-      // try {
-      //   generateReceiptPDF(orderResponse);
-      // } catch (pdfError) {
-      //   console.error('Error generating PDF receipt:', pdfError);
-      // }
       cleanExtraOrder();
 
       setTimeout(() => {
@@ -157,71 +149,6 @@ export default function AddressPage() {
           console.error('', error);
         });
     }
-  };
-
-  // Function to generate and download the PDF receipt
-  const generateReceiptPDF = (orderData: any) => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    let y = 20;
-
-    // Header
-    doc.setFontSize(20);
-    doc.setFont("helvetica", "bold");
-    doc.text("Mateng - Thank You for Ordering", pageWidth / 2, y, { align: "center" });
-    y += 15;
-
-    // Order Details
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Order ID: ${orderData.order_id}`, 20, y);
-    y += 8;
-    doc.text(`Buyer Name: ${orderData.buyer_name}`, 20, y);
-    y += 8;
-    doc.text(`Address: ${orderData.buyer_address}`, 20, y);
-    y += 8;
-    doc.text(`Phone: ${orderData.buyer_phone}`, 20, y);
-    y += 8;
-    doc.text(`Email: ${orderData.email}`, 20, y);
-    y += 8;
-    doc.text(`Status: ${orderData.status}`, 20, y);
-    y += 8;
-    doc.text(`Landmark: ${orderData.landmark}`, 20, y);
-    y += 8;
-    const formattedDate = format(new Date(orderData.order_at), "dd MMM, yyyy - h:mm a");
-    doc.text(`Order Date: ${formattedDate}`, 20, y);
-    y += 15;
-
-    // Product Table Header
-    doc.setFont("helvetica", "bold");
-    doc.text("Product Name", 20, y);
-    doc.text("Quantity", 80, y);
-    doc.text("MRP Price", 110, y);
-    y += 5;
-    doc.line(20, y, 190, y);
-    y += 8;
-
-    // Product Table Rows
-    doc.setFont("helvetica", "normal");
-    orderData.item_list.forEach((item: any) => {
-      doc.text(item.product_name, 20, y);
-      doc.text(item.quantity.toString(), 80, y);
-      doc.text(`Rs. ${item.price.toFixed(2)}`, 110, y); 
-      y += 8;
-    });
-
-    // Totals
-    y += 10;
-    doc.line(20, y - 5, 190, y - 5); 
-    doc.setFont("helvetica", "bold");
-    doc.text(`Total MRP: Rs. ${orderData.total_price}`, 20, y);
-    y += 8;
-    const discount = orderData.total_price - orderData.total_calculated_price;
-    doc.text(`Discount: Rs. ${discount}`, 20, y);
-    y += 8;
-    doc.text(`Total Calculated Price: Rs. ${orderData.total_calculated_price}`, 20, y);
-
-    doc.save(`Receipt_${orderData.order_id}.pdf`);
   };
 
   return (

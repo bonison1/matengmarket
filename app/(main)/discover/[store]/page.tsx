@@ -258,7 +258,7 @@ export default function Page() {
                     <div className="text-gray-900">{storeDetails.categories || 'N/A'}</div>
 
                     <div className="font-medium text-gray-700">Rating:</div>
-                    <div className="text-gray-900"><Rating rating={5} editable={false} size={22} /></div>
+                    <div className="text-gray-900"><Rating rating={storeDetails.rating} editable={false} size={22} /></div>
                   </div>
                 </CardContent>
               </Card>
@@ -360,7 +360,7 @@ export default function Page() {
                   <div className="flex flex-row items-center gap-3">
                     <CardDescription className="text-base pl-1">Rate our Service/Store:</CardDescription>
                     <Rating rating={rating} onRate={(star) => {
-                      console.log('Rated:', star);
+                      // console.log('Rated:', star);
                       setRating(star);
                     }} editable={true} size={24} />
                   </div>

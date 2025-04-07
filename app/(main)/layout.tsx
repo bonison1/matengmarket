@@ -15,20 +15,11 @@ export default function MainLayout({
   return (
     <>
       <Provider store={store}>
-        <div className="w-[100vw] custom-bg relative">
-          <div className="lines">
-            <div className="line"></div>
-            <div className="line"></div>
-            <div className="line"></div>
-            <div className="line"></div>
-          </div>
-          <div className="bg-overlay"></div>
           <UserLoader />
           <CartLoader />
           <StorageWatcher />
           <Navbar />
           {children}
-        </div>
       </Provider>
     </>
   );

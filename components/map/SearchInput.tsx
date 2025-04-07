@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useContext, useEffect, useRef, useCallback } from "react";
+import React, { useState, useContext, useEffect, useRef, useCallback, forwardRef } from "react";
 import { MapContext } from "../context/MapContext";
 import { ScrollArea } from "../ui/scroll-area";
 import debounce from "lodash/debounce";
@@ -9,7 +9,7 @@ interface SearchInputProps {
   type: "pickup" | "drop";
 }
 
-const SearchInput = ({ type }: SearchInputProps) => {
+const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(({ type }, ref) => {
   const {
     pickup,
     dropoff,
@@ -36,6 +36,8 @@ const SearchInput = ({ type }: SearchInputProps) => {
   useEffect(() => {
     if (location?.name) {
       setQuery(location.name);
+    } else {
+      setQuery(""); 
     }
   }, [location]);
 
@@ -125,7 +127,7 @@ const SearchInput = ({ type }: SearchInputProps) => {
         updateLocation([lng, lat], suggestion.description);
         setQuery(suggestion.description);
       } else {
-        console.error(" Fallout coordinates invalid:", suggestion);
+        console.error("Fallout coordinates invalid:", suggestion);
       }
     }
 
@@ -137,6 +139,7 @@ const SearchInput = ({ type }: SearchInputProps) => {
       <fieldset className="border-2 border-gray-400/30 rounded-lg text-sm w-84 p-2 pt-0">
         <legend className="text-gray-200/70 capitalize ml-1">{type} location</legend>
         <input
+          ref={ref} // Forward the ref to the input element
           type="text"
           value={query}
           onChange={handleInputChange}
@@ -165,6 +168,9 @@ const SearchInput = ({ type }: SearchInputProps) => {
       )}
     </div>
   );
-};
+});
+
+
+SearchInput.displayName = 'SearchInput';
 
 export default SearchInput;

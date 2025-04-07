@@ -15,7 +15,7 @@ export const GET = async (req: NextRequest) => {
         business_experience: true,
         photo: true,
         categories: true,
-        ratings: true,
+        rating: true,
         whatsapp: true,
       },
       orderBy: {

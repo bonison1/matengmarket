@@ -1,11 +1,27 @@
 "use client";
 
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { MapContext } from "../context/MapContext";
 import SearchInput from "./SearchInput";
 import { calculatePrice } from "@/lib/calculatePrice";
 import { Label } from "../ui/label";
-import { Card, CardContent, CardDescription, CardHeader } from "../ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "../ui/card";
+import { Button } from "../ui/button";
+
+interface Location {
+  coords: [number, number];
+  name: string;
+}
+
+interface DistanceMatrixComponentProps {
+  onDataUpdate?: (data: {
+    pickup: Location | null;
+    dropoff: Location | null;
+    distance: number | null;
+    time: string | null;
+    price: string | null;
+  }) => void;
+}
 
 const decodePolyline = (encoded: string) => {
   let points: number[][] = [];
@@ -41,7 +57,7 @@ const decodePolyline = (encoded: string) => {
   return points;
 };
 
-const DistanceMatrixComponent = () => {
+const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDataUpdate }) => {
   const { pickup, dropoff, updatePickup, updateDropoff } = useContext(MapContext);
   const [map, setMap] = useState<any>(null);
   const [olaMapsInstance, setOlaMapsInstance] = useState<any>(null);
@@ -53,6 +69,24 @@ const DistanceMatrixComponent = () => {
   const [geolocate, setGeolocate] = useState<any>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locationPermission, setLocationPermission] = useState<boolean | null>(null);
+
+  const pickupInputRef = useRef<HTMLInputElement>(null);
+  const dropoffInputRef = useRef<HTMLInputElement>(null);
+
+  // Store previous data to compare and avoid unnecessary updates
+  const prevDataRef = useRef<{
+    pickup: Location | null;
+    dropoff: Location | null;
+    distance: number | null;
+    time: string | null;
+    price: string | null;
+  }>({
+    pickup: null,
+    dropoff: null,
+    distance: null,
+    time: null,
+    price: null,
+  });
 
   const manipurLocation = { lat: 24.817, lng: 93.936 };
 
@@ -192,13 +226,11 @@ const DistanceMatrixComponent = () => {
         updatePickup([lng, lat], name);
       });
 
-      // Focus map on pickup location
       map.setCenter(pickup.coords);
       map.setZoom(15);
     } else if (pickupMarker && pickup) {
       pickupMarker.setLngLat(pickup.coords);
 
-      // Focus map on pickup if dropoff isn’t set yet
       if (!dropoff) {
         map.setCenter(pickup.coords);
         map.setZoom(15);
@@ -251,10 +283,28 @@ const DistanceMatrixComponent = () => {
 
           if (data.status === "SUCCESS" && data.rows?.[0]?.elements?.[0]?.status === "OK") {
             const element = data.rows[0].elements[0];
-            const distanceInKm = element.distance / 1000; // Convert meters to kilometers
+            const distanceInKm = element.distance / 1000; 
+            const timeValue = `${Math.round(element.duration / 60)} mins`;
+            const priceValue = `${calculatePrice(distanceInKm).toFixed(2)}`;
+
             setDistance(distanceInKm);
-            setTime(`${Math.round(element.duration / 60)} mins`);
-            setPrice(`Rs ${calculatePrice(distanceInKm).toFixed(2)}`); // Calculate and set price
+            setTime(timeValue);
+            setPrice(priceValue);
+
+            // Only call onDataUpdate if data has changed
+            const newData = { pickup, dropoff, distance: distanceInKm, time: timeValue, price: priceValue };
+            const prevData = prevDataRef.current;
+            if (
+              onDataUpdate &&
+              (prevData.pickup !== pickup ||
+                prevData.dropoff !== dropoff ||
+                prevData.distance !== distanceInKm ||
+                prevData.time !== timeValue ||
+                prevData.price !== priceValue)
+            ) {
+              onDataUpdate(newData);
+              prevDataRef.current = newData;
+            }
 
             if (element.polyline) {
               const coordinates = decodePolyline(element.polyline);
@@ -303,12 +353,40 @@ const DistanceMatrixComponent = () => {
             setDistance(null);
             setTime("N/A");
             setPrice("N/A");
+            if (onDataUpdate) {
+              const newData = { pickup, dropoff, distance: null, time: "N/A", price: "N/A" };
+              const prevData = prevDataRef.current;
+              if (
+                prevData.pickup !== pickup ||
+                prevData.dropoff !== dropoff ||
+                prevData.distance !== null ||
+                prevData.time !== "N/A" ||
+                prevData.price !== "N/A"
+              ) {
+                onDataUpdate(newData);
+                prevDataRef.current = newData;
+              }
+            }
           }
         } catch (error) {
           console.error("Failed to fetch distance matrix:", error);
           setDistance(null);
           setTime("Error");
           setPrice("Error");
+          if (onDataUpdate) {
+            const newData = { pickup, dropoff, distance: null, time: "Error", price: "Error" };
+            const prevData = prevDataRef.current;
+            if (
+              prevData.pickup !== pickup ||
+              prevData.dropoff !== dropoff ||
+              prevData.distance !== null ||
+              prevData.time !== "Error" ||
+              prevData.price !== "Error"
+            ) {
+              onDataUpdate(newData);
+              prevDataRef.current = newData;
+            }
+          }
         }
       };
 
@@ -317,30 +395,102 @@ const DistanceMatrixComponent = () => {
       setDistance(null);
       setTime(null);
       setPrice(null);
+      if (onDataUpdate) {
+        const newData = { pickup, dropoff, distance: null, time: null, price: null };
+        const prevData = prevDataRef.current;
+        if (
+          prevData.pickup !== pickup ||
+          prevData.dropoff !== dropoff ||
+          prevData.distance !== null ||
+          prevData.time !== null ||
+          prevData.price !== null
+        ) {
+          onDataUpdate(newData);
+          prevDataRef.current = newData;
+        }
+      }
       if (map && map.getLayer("route")) map.removeLayer("route");
       if (map && map.getSource("route")) map.removeSource("route");
     }
-  }, [map, pickup, dropoff]);
+  }, [map, pickup, dropoff, onDataUpdate]);
+
+  // const resetMap = () => {
+  //   // Remove markers
+  //   if (pickupMarker) {
+  //     pickupMarker.remove();
+  //     setPickupMarker(null);
+  //   }
+  //   if (dropoffMarker) {
+  //     dropoffMarker.remove();
+  //     setDropoffMarker(null);
+  //   }
+
+  //   if (map && map.getLayer("route")) map.removeLayer("route");
+  //   if (map && map.getSource("route")) map.removeSource("route");
+
+  //   // Reset context locations
+  //   if (pickup) {
+  //     updatePickup([manipurLocation.lng, manipurLocation.lat], ''); 
+  //   }
+  //   if (dropoff) {
+  //     updateDropoff([manipurLocation.lng, manipurLocation.lat], ''); 
+  //   }
+
+  //   // Clear input fields
+  //   if (pickupInputRef.current) pickupInputRef.current.value = '';
+  //   if (dropoffInputRef.current) dropoffInputRef.current.value = '';
+
+  //   // Reset state values
+  //   setDistance(null);
+  //   setTime(null);
+  //   setPrice(null);
+    
+
+  //   // Reset map view to default location
+  //   if (map) {
+  //     map.setCenter([manipurLocation.lng, manipurLocation.lat]);
+  //     map.setZoom(15);
+  //     map.marker.remove();
+  //   }
+
+  //   // Update parent component
+  //   if (onDataUpdate) {
+  //     const resetData = {
+  //       pickup: null,
+  //       dropoff: null,
+  //       distance: null,
+  //       time: null,
+  //       price: null
+  //     };
+  //     onDataUpdate(resetData);
+  //     prevDataRef.current = resetData;
+  //   }
+  // };
 
   return (
     <>
       <div className="flex flex-col md:flex-row gap-4 h-full">
         <div className="flex flex-col sm:flex-row md:flex-col gap-2 sm:gap-4 md:w-84">
           <div className="flex flex-col gap-6">
-            <SearchInput type="pickup" />
-            <SearchInput type="drop" />
+            <SearchInput type="pickup" ref={pickupInputRef} />
+            <SearchInput type="drop" ref={dropoffInputRef} />
           </div>
 
           <div className="mt-4 flex justify-center">
             {pickup && dropoff ? (
               <Card className="w-full">
                 <CardHeader>
-                  <CardDescription><strong># Disclaimer:</strong> Distance, time, and price are approximate estimates from map calculations, and actual values may vary.</CardDescription>
+                  <CardDescription>
+                    <strong># Disclaimer:</strong> Distance, time, and price are approximate estimates from map
+                    calculations, and actual values may vary.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-row gap-2">
                     <Label className="text-base text-zinc-300 font-bold">Distance:</Label>
-                    <span className="text-lg text-green-400 font-semibold">{distance !== null ? `${distance.toFixed(1)} km` : "Calculating..."}</span>
+                    <span className="text-lg text-green-400 font-semibold">
+                      {distance !== null ? `${distance.toFixed(1)} km` : "Calculating..."}
+                    </span>
                   </div>
                   <div className="flex flex-row gap-2">
                     <Label className="text-base text-zinc-300 font-bold">Time:</Label>
@@ -348,12 +498,17 @@ const DistanceMatrixComponent = () => {
                   </div>
                   <div className="flex flex-row gap-2">
                     <Label className="text-base text-zinc-300 font-bold">Cost:</Label>
-                    <span className="text-lg text-green-400 font-semibold">{price || "Calculating..."}</span>
+                    <span className="text-lg text-green-400 font-semibold">{`₹ ${price}` || "Calculating..."}</span>
                   </div>
                 </CardContent>
+                {/* <CardFooter>
+                <Button variant="destructive" onClick={resetMap}>Reset</Button>
+                </CardFooter> */}
               </Card>
             ) : (
-              <CardDescription className="px-2">Select pick-up and drop-off locations to see distance, time, and price.</CardDescription>
+              <CardDescription className="px-2">
+                Select pick-up and drop-off locations to see distance, time, and price.
+              </CardDescription>
             )}
           </div>
         </div>
@@ -362,7 +517,6 @@ const DistanceMatrixComponent = () => {
           <div id="map" style={{ width: "100%", height: "480px" }} />
         </div>
       </div>
-
     </>
   );
 };

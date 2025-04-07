@@ -1,15 +1,12 @@
-// context/MapContext.tsx
 "use client";
 
 import { createContext, useState, ReactNode } from "react";
 
-// Define the type for a location (coordinates and name)
 interface Location {
   coords: [number, number]; // [lng, lat]
   name: string;
 }
 
-// Define the type for a suggestion (based on Ola Maps Autocomplete API response)
 interface Suggestion {
   place_id: string;
   description: string;
@@ -18,7 +15,6 @@ interface Suggestion {
   };
 }
 
-// Define the context shape
 interface MapContextType {
   pickup: Location | null;
   dropoff: Location | null;
@@ -30,7 +26,6 @@ interface MapContextType {
   updateDropoffSuggestions: (suggestions: Suggestion[]) => void;
 }
 
-// Create the context with a default value
 export const MapContext = createContext<MapContextType>({
   pickup: null,
   dropoff: null,
