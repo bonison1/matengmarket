@@ -11,16 +11,17 @@ import {
 } from "framer-motion";
 import './timeline.css'
 import { useTheme } from "next-themes";
+import { CardDescription, CardTitle } from "@/components/ui/card";
 
 export default function Page() {
   const ref = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null); 
+  const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
   const { setTheme } = useTheme();
 
-   useEffect(() => {
-      setTheme("dark");
-    }, []);
+  useEffect(() => {
+    setTheme("dark");
+  }, []);
 
   useEffect(() => {
     if (ref.current) {
@@ -31,7 +32,7 @@ export default function Page() {
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end end"], 
+    offset: ["start start", "end end"],
   });
 
   const heightTransform = useTransform(scrollYProgress, [0, 1], [0, height]);
@@ -44,8 +45,18 @@ export default function Page() {
         className="w-[100vw] h-[100svh] relative bg-neutral-950 overflow-y-auto no-scrollbar"
       >
         <div className="w-full h-16"></div>
-        <div className="w-full max-w-[1400px] mx-auto p-4">
-          <div className="w-full max-w-[1200px] mx-auto">paage</div>
+        <div className="w-full max-w-[1400px] mx-auto mt-6 p-4">
+          <div className="w-full max-w-[1200px] mx-auto space-y-3">
+            <CardTitle className='text-2xl md:text-4xl font-semibold bg-clip-text text-transparent bg-gradient-to-b from-neutral-100 to-neutral-400'>What do We do?</CardTitle>
+            <CardDescription className='text-base md:text-lg'>
+              Mateng is your go-to platform for discovering the unknown and
+              meeting your product/service needs. Our reliable and free discovery
+              platform aims to quickly grow businesses from scratch. With our integrated
+              Mateng Delivery Service, we provide SMEs with seamless shipping solutions.
+              Experience a swift and efficient way to know everything and get what you
+              need, all in one place.
+            </CardDescription>
+          </div>
           <div className="h-[40rem]">
             <LayoutGrid cards={cards} />
           </div>

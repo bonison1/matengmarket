@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from 'next/link';
-import "./page.css"
 import Footer from "@/components/footer/Footer";
 
 export default function page() {
