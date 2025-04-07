@@ -193,12 +193,12 @@ export default function ProfilePage() {
           dispatch(setUser(updatedUser.data));
           setIsDialogOpen(false);
           toast.success("Profile updated successfully!", {
-            position: "top-center",
+            position: "top-right",
           });
         } catch (err) {
           const errorMessage = err instanceof Error ? err.message : "An error occurred";
           toast.error(errorMessage, {
-            position: "top-center",
+            position: "top-right",
           });
         }
       };

@@ -10,11 +10,17 @@ import {
   motion,
 } from "framer-motion";
 import './timeline.css'
+import { useTheme } from "next-themes";
 
 export default function Page() {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null); 
   const [height, setHeight] = useState(0);
+  const { setTheme } = useTheme();
+
+   useEffect(() => {
+      setTheme("dark");
+    }, []);
 
   useEffect(() => {
     if (ref.current) {

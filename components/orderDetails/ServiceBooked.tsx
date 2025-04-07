@@ -160,15 +160,15 @@ function ServiceBooked({ orders, loading, error }: ServiceBookedProps) {
                                         <span className="text-green-500"><Phone size={14} /></span>
                                         {order.pickup_phone}
                                     </CardDescription>
-                                    <CardDescription className="flex flex-row gap-2 items-start">
+                                    <CardDescription>
                                         <a
                                             href={`https://www.google.com/maps?q=${order.pickup_cord}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-start gap-2 text-red-400 hover:underline mt-1"
+                                            className="flex items-start gap-2 text-red-400 hover:underline"
                                         >
-                                            <MapPin size={14} />
-                                            <span className="text-gray-200">{order.pickup_address}</span>
+                                            <MapPin size={14} className="min-w-4 mt-1" />
+                                            <span className="text-gray-400">{order.pickup_address}</span>
                                         </a>
                                     </CardDescription>
 
@@ -190,15 +190,15 @@ function ServiceBooked({ orders, loading, error }: ServiceBookedProps) {
                                         <span className="text-green-500"><Phone size={14} /></span>
                                         {order.dropoff_phone}
                                     </CardDescription>
-                                    <CardDescription className="flex flex-row gap-2 items-start">
+                                    <CardDescription>
                                         <a
                                             href={`https://www.google.com/maps?q=${order.dropoff_cord}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex items-start gap-2 text-red-400 hover:underline mt-1"
                                         >
-                                            <MapPin size={14} />
-                                            <span className="text-gray-200">{order.dropoff_address}</span>
+                                            <MapPin size={14} className="min-w-4 mt-1" />
+                                            <span className="text-gray-400">{order.dropoff_address}</span>
                                         </a>
                                     </CardDescription>
 
@@ -228,7 +228,7 @@ function ServiceBooked({ orders, loading, error }: ServiceBookedProps) {
                                         {order.isBusiness !== null ? (order.isBusiness ? "Yes" : "No") : "No"}
                                     </CardDescription>
                                 </div>
-                                <div className="flex justify-end mt-3">
+                                <div className="flex justify-start mt-3">
                                     <Button
                                         onClick={() => {
                                             const url = `https://www.google.com/maps/dir/?api=1&origin=${order.pickup_cord}&destination=${order.dropoff_cord}`;
