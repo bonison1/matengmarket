@@ -194,7 +194,7 @@ export default function Page() {
                 <Image
                   width={300}
                   height={300}
-                  src={storeDetails.photo || "/unavailable.jpg"}
+                  src={storeDetails.photo || "/store.jpg"}
                   alt="logo"
                   className="w-44 h-44 rounded-full object-cover"
                 />

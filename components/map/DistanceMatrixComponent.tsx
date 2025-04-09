@@ -7,6 +7,7 @@ import { calculatePrice } from "@/lib/calculatePrice";
 import { Label } from "../ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 interface Location {
   coords: [number, number];
@@ -21,6 +22,7 @@ interface DistanceMatrixComponentProps {
     time: string | null;
     price: string | null;
   }) => void;
+  onBookService?: () => void;
 }
 
 const decodePolyline = (encoded: string) => {
@@ -57,7 +59,7 @@ const decodePolyline = (encoded: string) => {
   return points;
 };
 
-const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDataUpdate }) => {
+const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDataUpdate, onBookService, }) => {
   const { pickup, dropoff, updatePickup, updateDropoff } = useContext(MapContext);
   const [map, setMap] = useState<any>(null);
   const [olaMapsInstance, setOlaMapsInstance] = useState<any>(null);
@@ -69,6 +71,7 @@ const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDat
   const [geolocate, setGeolocate] = useState<any>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locationPermission, setLocationPermission] = useState<boolean | null>(null);
+  const [isMapLoading, setIsMapLoading] = useState(true);
 
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const dropoffInputRef = useRef<HTMLInputElement>(null);
@@ -136,6 +139,7 @@ const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDat
   useEffect(() => {
     const loadSDK = async () => {
       try {
+        setIsMapLoading(true);
         const { OlaMaps } = await import("olamaps-web-sdk");
         const olaMaps = new OlaMaps({ apiKey: process.env.NEXT_PUBLIC_OLA_API_KEY! });
         setOlaMapsInstance(olaMaps);
@@ -155,15 +159,18 @@ const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDat
           myMap.addControl(geolocateControl);
           setGeolocate(geolocateControl);
           if (locationPermission) geolocateControl.trigger();
+          setIsMapLoading(false);
         });
 
         myMap.on("error", (e: any) => {
           console.error("Map error:", e);
+          setIsMapLoading(false);
         });
 
         setMap(myMap);
       } catch (error) {
         console.error("Failed to initialize map:", error);
+        setIsMapLoading(false);
       }
     };
 
@@ -283,7 +290,7 @@ const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDat
 
           if (data.status === "SUCCESS" && data.rows?.[0]?.elements?.[0]?.status === "OK") {
             const element = data.rows[0].elements[0];
-            const distanceInKm = element.distance / 1000; 
+            const distanceInKm = element.distance / 1000;
             const timeValue = `${Math.round(element.duration / 60)} mins`;
             const priceValue = `${calculatePrice(distanceInKm).toFixed(2)}`;
 
@@ -444,7 +451,7 @@ const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDat
   //   setDistance(null);
   //   setTime(null);
   //   setPrice(null);
-    
+
 
   //   // Reset map view to default location
   //   if (map) {
@@ -481,7 +488,7 @@ const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDat
               <Card className="w-full">
                 <CardHeader>
                   <CardDescription>
-                    <strong># Disclaimer:</strong> Distance, time, and price are approximate estimates from map
+                    <strong># Disclaimer:</strong> Distance and price are approximate estimates from map
                     calculations, and actual values may vary.
                   </CardDescription>
                 </CardHeader>
@@ -492,18 +499,24 @@ const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDat
                       {distance !== null ? `${distance.toFixed(1)} km` : "Calculating..."}
                     </span>
                   </div>
-                  <div className="flex flex-row gap-2">
+                  {/* <div className="flex flex-row gap-2">
                     <Label className="text-base text-zinc-300 font-bold">Time:</Label>
                     <span className="text-lg text-green-400 font-semibold">{time || "Calculating..."}</span>
-                  </div>
+                  </div> */}
                   <div className="flex flex-row gap-2">
                     <Label className="text-base text-zinc-300 font-bold">Cost:</Label>
                     <span className="text-lg text-green-400 font-semibold">{`₹ ${price}` || "Calculating..."}</span>
                   </div>
                 </CardContent>
-                {/* <CardFooter>
-                <Button variant="destructive" onClick={resetMap}>Reset</Button>
-                </CardFooter> */}
+                <CardFooter>
+                  <Button
+                    className="text-white w-full"
+                    onClick={() => onBookService && onBookService()}
+                    disabled={!pickup || !dropoff}
+                  >
+                    Booked Service
+                  </Button>
+                </CardFooter>
               </Card>
             ) : (
               <CardDescription className="px-2">
@@ -512,8 +525,8 @@ const DistanceMatrixComponent: React.FC<DistanceMatrixComponentProps> = ({ onDat
             )}
           </div>
         </div>
-        <div className="flex-1 flex flex-col px-2">
-          {/* {locationError && <p className="text-red-500 mb-2">{locationError}</p>} */}
+        <div className="flex-1 px-2">
+          {isMapLoading && <Skeleton className="w-full h-[480px]" />}
           <div id="map" style={{ width: "100%", height: "480px" }} />
         </div>
       </div>

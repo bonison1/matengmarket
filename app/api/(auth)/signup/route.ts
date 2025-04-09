@@ -63,13 +63,13 @@ const sendSignupEmail = async (toEmail: string, name: string) => {
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-      user: 'clintonlai.lms@gmail.com',
-      pass: 'woiw tzei pcnx duke',
+      user: 'justmatengservice@gmail.com',
+      pass: 'yqpw aoca ppsi pnhk',
     },
   });
 
   const mailOptions = {
-    from: '"testing" <clintonlai.lms@gmail.com>',
+    from: '"Justmateng" <justmatengservice@gmail.com>',
     to: toEmail,
     subject: 'Welcome to Mateng - Start Shopping Today!',
     html: `

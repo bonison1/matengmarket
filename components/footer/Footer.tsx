@@ -14,6 +14,9 @@ export default function Footer() {
         <Link href={`/contact-us`}>
           <Button variant="link" className='p-0 h-6 text-zinc-500 hover:text-green-600'>Contact Us</Button>
         </Link>
+        <Link href="https://cargo3.vercel.app">
+          <Button variant="link" className='p-0 h-6 text-zinc-500 hover:text-green-600'>Cargo Service</Button>
+        </Link>
         <Link href={`/terms`}>
           <Button variant="link" className='p-0 h-6 text-zinc-500 hover:text-green-600'>Terms & Conditions</Button>
         </Link>

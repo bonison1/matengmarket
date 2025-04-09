@@ -42,27 +42,27 @@ const Cart: React.FC = () => {
   const handleCheckout = () => {
     const cartData = localStorage.getItem('cart');
     let cartItems = [];
-  
+
     if (cartData) {
       try {
         const parsedCart = JSON.parse(cartData);
-        cartItems = parsedCart.items || []; 
+        cartItems = parsedCart.items || [];
       } catch (error) {
         console.error('Error parsing cart data:', error);
-        return; 
+        return;
       }
     }
-  
+
     if (cartItems.length === 0) {
       toast.error('Please add products to order!', {
         position: 'top-right',
       });
       setTimeout(() => {
         router.push('/products');
-      }, 1500); 
+      }, 1500);
       return;
     }
-  
+
     const customerId = localStorage.getItem('customer_id');
     if (customerId) {
       router.push('/cart/address');
@@ -165,6 +165,10 @@ const Cart: React.FC = () => {
             <div className="border-t pt-4 flex justify-between text-lg font-semibold">
               <CardTitle>Grand Total</CardTitle>
               <p>₹{totalPrice.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between items-center mt-4">
+              <span className="text-gray-600 text-sm font-medium">Payment Mode - </span>
+              <CardDescription>Cash on Delivery</CardDescription>
             </div>
             <div className="w-full flex justify-center">
               <Button

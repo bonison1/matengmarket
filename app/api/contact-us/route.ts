@@ -18,7 +18,7 @@ const sendContactEmail = async (
 
   const mailOptions = {
     from: '"Justmateng" <justmateng@gmail.com>',
-    to: 'support@mateng.com', 
+    to: 'justmatengservice@gmail.com', 
     cc: email, 
     subject: `Contact Form Submission: ${subject}`,
     html: `

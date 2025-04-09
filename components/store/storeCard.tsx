@@ -50,10 +50,10 @@ export default function StoreCard({ store }: StoreCardProps) {
                     <Image
                         width={600}
                         height={600}
-                        src={store.photo || "/unavailable.jpg"}
+                        src={store.photo || "/store.jpg"}
                         alt={store.business_name}
                         className='object-cover rounded-lg h-[70%] w-full'
-                        onError={(e) => { e.currentTarget.src = "/unavailable.jpg"; }}
+                        onError={(e) => { e.currentTarget.src = "/store.jpg"; }}
                         onClick={handleNavigate}
                         loading='lazy'
                     />

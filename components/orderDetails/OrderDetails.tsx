@@ -53,7 +53,7 @@ function OrderDetails({ orders, loading, error }: OrderDetailsProps) {
     doc.setFont("helvetica", "bold");
 
     // Header
-    doc.setFillColor(0, 122, 255);
+    doc.setFillColor(0, 128, 0);
     doc.rect(0, y - 10, pageWidth, 15, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18);
@@ -134,8 +134,18 @@ function OrderDetails({ orders, loading, error }: OrderDetailsProps) {
   }
 
   if (error) {
-    return <div className="text-center py-10 text-red-500">{error}</div>;
-  }
+    const isNoOrders =
+        error === "No orders found for this buyer_id" ||
+        error === "404" ||
+        (typeof error === "string" && error.includes("404")) ||
+        (typeof error === "string" && error.includes("No orders found for this buyer_id"));
+
+    return (
+        <div className="text-center py-10 text-gray-400">
+            {isNoOrders ? "No order placed yet" : "Something went wrong, please try again"}
+        </div>
+    );
+}
 
   return (
     <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -170,6 +180,7 @@ function OrderDetails({ orders, loading, error }: OrderDetailsProps) {
                 <p><strong>Name:</strong> {order.buyer_name}</p>
                 <p><strong>Address:</strong> {order.buyer_address}</p>
                 <p><strong>Phone No:</strong> {order.buyer_phone}</p>
+                <p className="capitalize"><strong>Status:</strong> {order.status}</p>
               </div>
               <Separator className="my-4" />
               {order.item_list.map((item: any) => (

@@ -106,7 +106,12 @@ export default function ProfilePage() {
             try {
                 const response = await fetch(`/api/order/buyer/getOrderByBuyerId?buyer_id=${buyer_id}`);
                 if (!response.ok) {
-                    throw new Error("Failed to fetch orders");
+                    const result = await response.json(); 
+                    console.log(result)
+                    if (response.status === 404) {
+                        throw result.message || "404";
+                    }
+                    throw new Error(result.message || "Failed to fetch orders");
                 }
                 const result = await response.json();
                 if (result.success) {
@@ -122,7 +127,7 @@ export default function ProfilePage() {
                     setOrdersError(result.message || "No orders found");
                 }
             } catch (err) {
-                setOrdersError(err instanceof Error ? err.message : "An error occurred");
+                setOrdersError(err instanceof Error ? err.message : String(err));
             } finally {
                 setOrdersLoading(false);
             }

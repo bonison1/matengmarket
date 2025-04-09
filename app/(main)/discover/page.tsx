@@ -87,7 +87,19 @@ export default function Page() {
     const lastRowCount = filteredStores.length % cardsPerRow;
     const placeholdersNeeded = lastRowCount === 0 ? 0 : cardsPerRow - lastRowCount;
 
-    const categories = ["Fruits", "Vegetables", "Dairy", "Beverages", "Snacks", "Frozen Food", "Bakery", "Pet Food"];
+    const categories = [
+        "Grocery",
+        "Instant Foods",
+        "Snacks",
+        "Soft Drinks And Juices",
+        "Books",
+        "Electronics",
+        "Personal Hygiene And Health",
+        "Books & Stationary",
+        "Fashion",
+        "Service",
+        "Others",
+      ];
 
     return (
         <div className='bg-[#efeee7] relative'>
@@ -105,7 +117,7 @@ export default function Page() {
                                     <span>Mateng Discovery</span>
                                 </div>
                                 <div className='w-full xl:w-1/2 leading-none text-xs sm:text-sm text-gray-200/90'>
-                                    <span>Purple raindrops danced on the windowpane during the unexpected summer storm.</span>
+                                    <span>Explore businesses nearby you.</span>
                                 </div>
                             </div>
 

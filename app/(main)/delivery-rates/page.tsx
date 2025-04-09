@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import DistanceMatrixComponent from "@/components/map/DistanceMatrixComponent";
 import Footer from "@/components/footer/Footer";
 import { Pin, Truck, Package, Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -73,6 +73,9 @@ export default function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pickupPhoneError, setPickupPhoneError] = useState("");
   const [dropoffPhoneError, setDropoffPhoneError] = useState("");
+
+  const [showForm, setShowForm] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const [mapData, setMapData] = useState<{
     pickup: Location | null;
@@ -249,23 +252,74 @@ export default function Page() {
     }
   };
 
+  useEffect(() => {
+    if (showForm && formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [showForm]);
+
   return (
     <ScrollArea>
       <div className="w-[100vw] h-[100svh] relative flex flex-col justify-between sm:p-4 poppins">
         <div className="mb-[4rem]">
           <div className="w-full h-16"></div>
 
-          <div className="w-full max-w-[1400px] mx-auto mb-4 p-4 relative">
-            <span className="text-3xl font-bold mb-6 flex justify-center items-center leading-none gap-1 w-fit bg-clip-text text-transparent bg-gradient-to-b from-neutral-100 to-neutral-400">
-              <Pin className="text-gray-300" />
-              Set Your Locations
-            </span>
-
-            <DistanceMatrixComponent onDataUpdate={handleDataUpdate} />
+          <div className='relative flex flex-col items-start p-4 my-6 sm:hidden sm:h-0'>
+            <CardDescription className="text-sm mb-3 text-gray-300 px-2">Visit our cargo service page to get started.</CardDescription>
+            <a href="https://cargo3.vercel.app">
+              <button
+                type="submit"
+                className="flex px-5 py-2.5 font-semibold justify-center gap-10 items-center mx-auto shadow-md text-sm text-white bg-gradient-to-tr from-green-900/30 via-green-900/70 to-green-900/30 ring-4 ring-green-900/20 backdrop-blur-md lg:font-medium isolation-auto before:absolute before:w-full before:transition-all before:duration-500 hover:before:w-full before:right-full hover:before:right-0 before:rounded-full before:bg-green-700 hover:text-gray-50 before:-z-10 before:aspect-square hover:before:scale-150 hover:before:duration-500 relative z-10 px-3.5 py-1.5 overflow-hidden border-2 rounded-full group"
+              >
+                Cargo Serice
+                <svg
+                  className="w-5 h-5 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-white ease-linear duration-300 rounded-full border border-white group-hover:border-none p-1 rotate-45"
+                  viewBox="0 0 16 19"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
+                    className="fill-white group-hover:fill-gray-800"
+                  ></path>
+                </svg>
+              </button>
+            </a>
           </div>
 
-          {mapData.pickup && mapData.dropoff && mapData.distance !== null ? (
-            <div className="p-4">
+          <div className="w-full max-w-[1400px] mx-auto mb-4 p-4 relative">
+            <div className="w-full flex justify-between">
+              <span className="text-3xl font-bold mb-6 flex justify-center items-center leading-none gap-1 w-fit bg-clip-text text-transparent bg-gradient-to-b from-neutral-100 to-neutral-400">
+                <Pin className="text-gray-300" />
+                Set Your Locations
+              </span>
+
+              <a href="https://cargo3.vercel.app" className="hidden sm:flex">
+                <button
+                  type="submit"
+                  className="flex px-5 h-10 mr-2 font-semibold justify-center gap-4 items-center mx-auto shadow-md text-sm text-white bg-gradient-to-tr from-green-900/30 via-green-900/70 to-green-900/30 ring-4 ring-green-900/20 backdrop-blur-md lg:font-medium isolation-auto before:absolute before:w-full before:transition-all before:duration-500 hover:before:w-full before:right-full hover:before:right-0 before:rounded-full before:bg-green-700 hover:text-gray-50 before:-z-10 before:aspect-square hover:before:scale-150 hover:before:duration-500 relative z-10 px-3.5 py-1.5 overflow-hidden border-2 rounded-full group"
+                >
+                  Cargo Serice
+                  <svg
+                    className="w-5 h-5 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-white ease-linear duration-300 rounded-full border border-white group-hover:border-none p-1 rotate-45"
+                    viewBox="0 0 16 19"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
+                      className="fill-white group-hover:fill-gray-800"
+                    ></path>
+                  </svg>
+                </button>
+              </a>
+            </div>
+
+            <DistanceMatrixComponent onDataUpdate={handleDataUpdate} onBookService={() => setShowForm(true)} />
+
+
+          </div>
+
+          {showForm && mapData.pickup && mapData.dropoff && mapData.distance !== null ? (
+            <div ref={formRef} className="p-4">
               <Card className="w-full max-w-[900px] mx-auto border-zinc-600 gap-5">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-100 to-neutral-400">
@@ -438,7 +492,18 @@ export default function Page() {
 
                     <Separator className="bg-zinc-600 " />
 
-                    <CardFooter className="flex justify-end px-0">
+                    <CardFooter className="flex justify-end gap-5 px-0">
+                      <Button
+                        variant="destructive"
+                        className="text-white bg-red-500"
+                        type="button"
+                        onClick={() => {
+                          setShowForm(false);
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        Cancel
+                      </Button>
                       <Button
                         className="text-white"
                         type="submit"
@@ -453,10 +518,10 @@ export default function Page() {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Booking...
+                            Placing...
                           </>
                         ) : (
-                          "Book Order"
+                          "Place Order"
                         )}
                       </Button>
                     </CardFooter>
@@ -492,7 +557,7 @@ export default function Page() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Dialog open={isDialogOpen} onOpenChange={() => {}}>
+      <Dialog open={isDialogOpen} onOpenChange={() => { }}>
         <DialogContent
           className="flex flex-col items-center p-6 w-80 gap-4"
           onInteractOutside={(e) => e.preventDefault()}

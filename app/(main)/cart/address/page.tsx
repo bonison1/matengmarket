@@ -285,6 +285,11 @@ export default function AddressPage() {
                             <span className="text-base font-semibold text-gray-900">Final Amount</span>
                             <span className="text-base font-bold text-gray-900">₹{cart.totalPrice}</span>
                           </div>
+
+                          <div className="flex justify-between items-center mt-4">
+                            <span className="text-gray-600 text-sm font-medium">Payment Mode</span>
+                            <CardDescription>Cash on Delivery</CardDescription>
+                          </div>
                         </div>
                       </div>
                     </CardContent>

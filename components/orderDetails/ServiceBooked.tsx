@@ -54,7 +54,7 @@ function ServiceBooked({ orders, loading, error }: ServiceBookedProps) {
         doc.setFont("helvetica", "bold");
 
         // Header
-        doc.setFillColor(0, 122, 255);
+        doc.setFillColor(0, 128, 0);
         doc.rect(0, y - 10, pageWidth, 15, "F");
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(18);
@@ -65,20 +65,32 @@ function ServiceBooked({ orders, loading, error }: ServiceBookedProps) {
         doc.setFontSize(12);
         doc.setTextColor(40, 40, 40);
         doc.setFont("helvetica", "normal");
-        doc.text(`Order ID: ${orderData.id}`, 20, y);
+        doc.text(`Service Booked ID: SB-${orderData.id}`, 20, y);
+        y += 12;
+        doc.setFont("helvetica", "bold");
+        doc.text("Pickup Details -", 20, y);
         y += 8;
-        doc.text(`Pickup Name: ${orderData.pickup_name}`, 20, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Name: ${orderData.pickup_name}`, 24, y);
         y += 8;
-        doc.text(`Pickup Phone: ${orderData.pickup_phone}`, 20, y);
+        doc.text(`Phone: ${orderData.pickup_phone}`, 24, y);
         y += 8;
-        doc.text(`Pickup Address: ${orderData.pickup_address}`, 20, y);
+        doc.text(`Address: ${orderData.pickup_address}`, 24, y);
         y += 8;
-        doc.text(`Dropoff Name: ${orderData.dropoff_name}`, 20, y);
+        doc.text(`Instruction: ${orderData.instructions.pickup}`, 24, y);
+        y += 12;
+        doc.setFont("helvetica", "bold");
+        doc.text("Dropoff Details -", 20, y);
         y += 8;
-        doc.text(`Dropoff Phone: ${orderData.dropoff_phone}`, 20, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Name: ${orderData.dropoff_name}`, 24, y);
         y += 8;
-        doc.text(`Dropoff Address: ${orderData.dropoff_address}`, 20, y);
+        doc.text(`Phone: ${orderData.dropoff_phone}`, 24, y);
         y += 8;
+        doc.text(`Address: ${orderData.dropoff_address}`, 24, y);
+        y += 8;
+        doc.text(`Instruction: ${orderData.instructions.dropoff}`, 24, y);
+        y += 12;
         doc.text(`Status: ${orderData.status}`, 20, y);
         y += 8;
         doc.text(`Order Date: ${format(new Date(orderData.created_at), "dd MMM, yyyy - h:mm a")}`, 20, y);
@@ -116,7 +128,13 @@ function ServiceBooked({ orders, loading, error }: ServiceBookedProps) {
     }
 
     if (error) {
-        return <div className="text-center py-10 text-red-500">{error}</div>;
+        const isNoOrders = error === "No delivery orders found for this customer_id" || error === "404" || (typeof error === "string" && error.includes("404"));
+    
+        return (
+            <div className="text-center py-10 text-gray-400">
+                {isNoOrders ? "No service booked yet" : "Something went wrong, please try again"}
+            </div>
+        );
     }
 
     return (

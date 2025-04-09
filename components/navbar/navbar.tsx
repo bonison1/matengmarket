@@ -23,6 +23,7 @@ import { Separator } from "../ui/separator";
 import "./navbar.css";
 import { clearCart } from "@/lib/cart/cartSlice";
 import { clearUser } from "@/lib/cart/userSlice";
+import { CardDescription } from "../ui/card";
 
 function Navbar() {
     const [isNavOpen, setNavOpen] = useState<boolean>(false);
@@ -270,6 +271,28 @@ function Navbar() {
 
                         <div className="mt-[4rem]">
                             {user ? <UserGreeting /> : <LoginButton />}
+                        </div>
+
+                        <div className='relative mt-[7rem]'>
+                            <CardDescription className="text-sm mb-3">Visit our cargo service page to get started.</CardDescription>
+                            <a href="https://cargo3.vercel.app">
+                                <button
+                                    type="submit"
+                                    className="flex px-6 py-3 justify-center font-semibold gap-10 items-center mx-auto shadow-md text-sm text-white bg-gradient-to-tr from-green-900/30 via-green-900/70 to-green-900/30 ring-4 ring-green-900/20 backdrop-blur-md lg:font-medium isolation-auto before:absolute before:w-full before:transition-all before:duration-500 hover:before:w-full before:right-full hover:before:right-0 before:rounded-full before:bg-green-700 hover:text-gray-50 before:-z-10 before:aspect-square hover:before:scale-150 hover:before:duration-500 relative z-10 px-3.5 py-1.5 overflow-hidden border-2 rounded-full group"
+                                >
+                                    Cargo Serice
+                                    <svg
+                                        className="w-5 h-5 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-white ease-linear duration-300 rounded-full border border-white group-hover:border-none p-1 rotate-45"
+                                        viewBox="0 0 16 19"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
+                                            className="fill-white group-hover:fill-gray-800"
+                                        ></path>
+                                    </svg>
+                                </button>
+                            </a>
                         </div>
                     </div>
                 </nav>
