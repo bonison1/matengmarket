@@ -58,7 +58,6 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-// Email sending function
 const sendSignupEmail = async (toEmail: string, name: string) => {
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
