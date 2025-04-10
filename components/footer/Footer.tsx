@@ -18,7 +18,7 @@ export default function Footer() {
           <Button variant="link" className='p-0 h-6 text-zinc-500 hover:text-green-600'>Cargo Service</Button>
         </Link>
         <Link href={`/terms`}>
-          <Button variant="link" className='p-0 h-6 text-zinc-500 hover:text-green-600'>Terms & Conditions</Button>
+          <Button variant="link" className='p-0 h-6 text-zinc-500 hover:text-green-600'>Terms</Button>
         </Link>
       </div>
     </div>
