@@ -59,6 +59,7 @@ function Navbar() {
         { name: "Home", href: "/home" },
         { name: "Marketplace", href: "/products" },
         { name: "Discover Seller", href: "/discover" },
+        { name: "Business Login", href: "https://matengbusiness.vercel.app/delivery_orders" },
         { name: "Delivery Rates", href: "/delivery-rates" },
     ];
 
