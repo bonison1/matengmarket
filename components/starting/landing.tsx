@@ -1,32 +1,14 @@
 "use client";
 
-import React from "react";
-import { useTheme } from "next-themes";
-import "./landing.css";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Landing() {
-  const { setTheme } = useTheme();
+  const router = useRouter();
 
-  React.useEffect(() => {
-    setTheme("dark");
-  }, [setTheme]);
+  useEffect(() => {
+    router.push("/home");
+  }, [router]);
 
-  const text = "mateng";
-
-  return (
-    <div className="landing flex flex-col items-center justify-center w-[100vw] h-[90vh] sm:h-[100vh]">
-      <div className="relative">
-        <div className="logo">
-          {text.split("").map((char, index) => (
-            <span key={index} className="letter">
-              {char}
-            </span>
-          ))}
-        </div>
-        <div className="tagline absolute bottom-0">
-          meeting people's needs
-        </div>
-      </div>
-    </div>
-  );
+  return null; // nothing is rendered
 }
