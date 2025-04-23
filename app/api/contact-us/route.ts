@@ -18,8 +18,8 @@ const sendContactEmail = async (
 
   const mailOptions = {
     from: '"Justmateng" <justmateng@gmail.com>',
-    to: 'justmatengservice@gmail.com', 
-    cc: email, 
+    to: 'justmatengservice@gmail.com',
+    cc: email,
     subject: `Contact Form Submission: ${subject}`,
     html: `
       <h2>New Contact Form Submission</h2>

@@ -9,12 +9,12 @@ const generateOrderId = () => `ORD-${Date.now()}${Math.floor(Math.random() * 90 
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { 
-      buyer_id, 
-      item_list, 
-      buyer_name = "", 
-      buyer_address = "", 
-      buyer_phone = "" 
+    const {
+      buyer_id,
+      item_list,
+      buyer_name = "",
+      buyer_address = "",
+      buyer_phone = ""
     } = body;
 
     const newOrder = await prisma.order_rec.create({
@@ -29,13 +29,15 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       data: { order_id: newOrder.order_id }
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating order:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };
 
@@ -43,13 +45,13 @@ export const POST = async (req: NextRequest) => {
 export const PUT = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { 
+    const {
       order_id,
-      buyer_id, 
-      item_list, 
-      buyer_name = "", 
-      buyer_address = "", 
-      buyer_phone = "" 
+      buyer_id,
+      item_list,
+      buyer_name = "",
+      buyer_address = "",
+      buyer_phone = ""
     } = body;
 
     if (!order_id) {
@@ -67,13 +69,15 @@ export const PUT = async (req: NextRequest) => {
       },
     });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       data: { order_id: updatedOrder.order_id }
     }, { status: 200 });
   } catch (error) {
     console.error('Error updating order:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };
 
@@ -88,5 +92,7 @@ export const GET = async () => {
   } catch (error) {
     console.error('Error fetching orders:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };

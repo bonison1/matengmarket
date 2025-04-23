@@ -26,7 +26,7 @@ export const POST = async (req: NextRequest) => {
     if (existingRating) {
       return NextResponse.json(
         { success: false, message: 'Feedback already given.' },
-        { status: 409 } 
+        { status: 409 }
       );
     }
 
@@ -57,5 +57,7 @@ export const POST = async (req: NextRequest) => {
       { success: false, message: (error as Error).message || 'Internal Server Error' },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 };

@@ -88,6 +88,8 @@ export const POST = async (req: NextRequest) => {
   } catch (error) {
     console.error('Error processing order items:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };
 
@@ -151,5 +153,7 @@ export const GET = async (req: NextRequest) => {
   } catch (error) {
     console.error('❌ Error fetching order items:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };

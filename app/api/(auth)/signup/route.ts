@@ -20,7 +20,7 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10); 
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newCustomer = await prisma.customers.create({
       data: {
@@ -55,6 +55,8 @@ export const POST = async (req: NextRequest) => {
       { success: false, message: error.message || 'Signup failed' },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 };
 
@@ -90,5 +92,7 @@ const sendSignupEmail = async (toEmail: string, name: string) => {
     await transporter.sendMail(mailOptions);
   } catch (error) {
     console.error("Failed to send signup email:", error);
+  } finally {
+    await prisma.$disconnect();
   }
 };

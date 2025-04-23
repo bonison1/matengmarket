@@ -180,5 +180,7 @@ export const GET = async (req: NextRequest) => {
       },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 };

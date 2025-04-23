@@ -61,6 +61,8 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error creating delivery order:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
@@ -123,6 +125,8 @@ export async function PUT(req: NextRequest) {
   } catch (error) {
     console.error("Error updating delivery order:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
@@ -152,5 +156,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Error fetching delivery orders:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

@@ -84,7 +84,7 @@ const Cart: React.FC = () => {
               return (
                 <Card key={item.id} className="shadow-lg p-4 flex flex-row gap-4 relative">
                   {/* Product Image */}
-                  <Image
+                  <img
                     src={item.media_urls?.[0] || "/unavailable.jpg"}
                     alt={item.name}
                     width={120}

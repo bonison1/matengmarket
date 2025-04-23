@@ -41,6 +41,8 @@ const sendOTPEmail = async (toEmail: string) => {
   } catch (error) {
     console.error("Failed to send OTP email:", error);
     return false;
+  } finally {
+    await prisma.$disconnect();
   }
 };
 
@@ -69,6 +71,8 @@ export const POST = async (req: NextRequest) => {
   } catch (error) {
     console.error('Forgot Password OTP Error:', error);
     return NextResponse.json({ message: 'Internal server error.' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };
 
@@ -118,5 +122,8 @@ export const PUT = async (req: NextRequest) => {
   } catch (error) {
     console.error('Reset Password Error:', error);
     return NextResponse.json({ message: 'Internal server error.' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
+
 };

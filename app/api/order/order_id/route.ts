@@ -35,5 +35,7 @@ export async function PUT(req: NextRequest) {
       { success: false, message: 'Order not found or update failed' },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

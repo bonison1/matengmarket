@@ -38,5 +38,7 @@ export const POST = async (req: NextRequest) => {
   } catch (error: any) {
     console.error('Login Error:', error);
     return NextResponse.json({ success: false, message: error.message || 'Login failed' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };

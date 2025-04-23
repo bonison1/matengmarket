@@ -70,5 +70,7 @@ export const DELETE = async (req: NextRequest) => {
       { success: false, message: 'Internal Server Error' },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 };

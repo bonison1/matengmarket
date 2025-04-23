@@ -19,7 +19,7 @@ export const GET = async (req: NextRequest) => {
         whatsapp: true,
       },
       orderBy: {
-        business_name: 'asc', 
+        business_name: 'asc',
       },
     });
 
@@ -48,5 +48,7 @@ export const GET = async (req: NextRequest) => {
       { success: false, message: (error as Error).message || 'Internal Server Error' },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 };

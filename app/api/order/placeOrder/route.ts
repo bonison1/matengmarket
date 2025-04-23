@@ -55,7 +55,7 @@ export const POST = async (req: NextRequest) => {
           buyer_phone,
           landmark,
           email,
-          order_at: order_at ? new Date(order_at) : new Date(), 
+          order_at: order_at ? new Date(order_at) : new Date(),
           status,
           item_list: items,
           item_count: items.length,
@@ -135,5 +135,7 @@ export const POST = async (req: NextRequest) => {
   } catch (error) {
     console.error('Error placing order:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 };
