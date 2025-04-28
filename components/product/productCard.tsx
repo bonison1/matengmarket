@@ -2,6 +2,9 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { useState, useRef, memo, useEffect, useCallback } from "react";
 import { Info, ShoppingBasket, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+// At the top of components/product/productCard.tsx
+
+
 import {
     Dialog,
     DialogContent,
@@ -31,7 +34,7 @@ const ProductImage = memo(({ src, alt, onClick, className = "" }: ProductImagePr
     const [imgSrc, setImgSrc] = useState(src || "/unavailable.jpg");
 
     return (
-        <img
+        <Image
             ref={imgRef}
             src={imgSrc}
             alt={alt}
@@ -92,7 +95,13 @@ const ProductDialog = ({ product, isOpen, onClose, selectedImage, onImageSelect 
                     <DialogHeader className="gap-1 text-left pr-4">
                         <DialogTitle className="text-xl leading-none">Product Details</DialogTitle>
                         <DialogTitle className="mt-4">{product.name}</DialogTitle>
-                        <DialogDescription>{product.unit_quantity || "n/a"}</DialogDescription>
+                        <DialogDescription>
+                            {product.unit_quantity !== undefined && product.unit_quantity !== null
+                                ? Number(product.unit_quantity)
+                                : 'n/a'} {product.unit || ''}
+                        </DialogDescription>
+
+                        {/* <DialogDescription>{product.unit_quantity || 'n/a'}{" "}{product.unit || ''}</DialogDescription> */}
                         <DialogDescription>{product.description}</DialogDescription>
                     </DialogHeader>
 
@@ -222,7 +231,13 @@ const ProductCard = memo(({ product }: ProductCardProps) => {
                         <CardTitle className="text-sm">{product.name}</CardTitle>
                     </div>
                     <span className="w-fit text-xs text-[#4371BB] bg-[#B8C7DF57] mb-auto py-1.5 px-3 rounded-full leading-none">
-                        {product.unit_quantity || "n/a"}
+                        {/* {product.unit_quantity || 'n/a'}{" "}{product.unit || ''} */}
+
+                        {product.unit_quantity !== undefined && product.unit_quantity !== null
+                            ? Number(product.unit_quantity)
+                            : 'n/a'} {product.unit || ''}
+
+
                     </span>
                 </div>
 
