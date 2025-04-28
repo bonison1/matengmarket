@@ -34,7 +34,7 @@ const ProductImage = memo(({ src, alt, onClick, className = "" }: ProductImagePr
     const [imgSrc, setImgSrc] = useState(src || "/unavailable.jpg");
 
     return (
-        <Image
+        <img
             ref={imgRef}
             src={imgSrc}
             alt={alt}
@@ -66,7 +66,7 @@ const ProductMedia = ({ src, alt }: { src: string; alt: string }) => {
         );
     }
     return (
-        <Image
+        <img
             width={600}
             height={700}
             src={src}
