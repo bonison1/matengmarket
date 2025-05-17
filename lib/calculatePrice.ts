@@ -13,14 +13,14 @@
 export const calculatePrice = (distance: number): number => {
   if (distance < 4) {
     return 60;
-  } else if (distance < 10) {
+  } else if (distance < 7) {
     const baseCharge = 17;
     const perKmRate = 8.5;
     return baseCharge + perKmRate * distance;
-  } else if (distance < 13) {
+  } else if (distance < 12) {
     return 130;
   } else if (distance < 20) {
-    return 140;
+    return 150;
   } else if (distance < 26) {
     return 180;
   } else if (distance < 30) {
